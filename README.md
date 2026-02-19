@@ -1,11 +1,21 @@
+# Planning
+### Week 2
+Briefing gekregen van de opdracht. Deadline Github link indienen 22 februari.
+### Week 3
+Volgende week beginnen we met het maken van de qr-code link tussen desktop en smartphone. Ook maak ik een planning voor de rest van het project te maken.
+### Week 4
+### Week 5
+### Week 6
+Deadline 22 maart.
+
 # Briefing
-## Minimaal
+### Minimaal
 - 1 op 1  controle met qr-code
 - mag oud schoolproject zijn
 - instructies en besturing duidelijk maken
 - webrtc data channels voor de aansturing
 - Websockets voor ignalling layer
-## Bonuspunten
+### Bonuspunten
 - accelerometer = versnelling in 3 assen = kantelbesturing, schuddetectie, jump/ boost
 - gyroscoop = rotatiesnelheid = camera rotaties, vr-achtige dingen
 - device orientation api = combi van bovenstaande = gsm als stuur
@@ -55,4 +65,3 @@ Gebruik je smartphone om slides op de desktop te besturen.
 
 - pointer laser = beweeg
 - dia veranderen = swipe
-
