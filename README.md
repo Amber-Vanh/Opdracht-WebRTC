@@ -1,8 +1,8 @@
 # Planning
 ### Week 2
-Briefing gekregen van de opdracht. Deadline Github link indienen 22 februari.
+Briefing gekregen van de opdracht. Deadline Github link indienen 22 februari. Ook het opstellen van verschillende concepten en het maken van de qr-code link tussen desktop en smartphone doen we voor het eerste consult.
 ### Week 3
-Volgende week beginnen we met het maken van de qr-code link tussen desktop en smartphone. Ook maak ik een planning voor de rest van het project te maken.
+Volgende week begin ik met een planning maken voor de rest van het project. Ook noteer ik de feedback van het eerste consult en begin ik met het uitwerken van het uitendelijke concept.
 ### Week 4
 ### Week 5
 ### Week 6
