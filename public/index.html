@@ -28,12 +28,25 @@
                     $url.textContent = url;
                     $url.setAttribute('href', url);
 
-                    const typeNumber = 4;
-                    const errorCorrectionLevel = 'L';
-                    const qr = qrcode(typeNumber, errorCorrectionLevel);
-                    qr.addData(url);
-                    qr.make();
-                    document.getElementById('qr').innerHTML = qr.createImgTag(4);
+                    try {
+                        // Check if qrcode library is loaded
+                        if (typeof qrcode === 'undefined') {
+                            console.error('QR-code library niet geladen!');
+                            document.getElementById('qr').innerHTML = '<p style="color: red;">QR-code library kon niet worden geladen</p>';
+                            return;
+                        }
+
+                        const typeNumber = 4;
+                        const errorCorrectionLevel = 'L';
+                        const qr = qrcode(typeNumber, errorCorrectionLevel);
+                        qr.addData(url);
+                        qr.make();
+                        document.getElementById('qr').innerHTML = qr.createImgTag(4);
+                        console.log('QR-code succesvol gegenereerd!');
+                    } catch (error) {
+                        console.error('Fout bij het genereren van QR-code:', error);
+                        document.getElementById('qr').innerHTML = `<p style="color: red;">Fout: ${error.message}</p>`;
+                    }
                 });
             };
 
