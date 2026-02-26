@@ -8,7 +8,7 @@
 - planning rest van het project OK
 - concept uitwerken OK
 - core feautures bepalen + onderzoeken OK
-- webrtc communicatie maken 
+- webrtc communicatie maken OK
 ### Week 4
 - Desktop console/log die emoties toont door bewegingen van de smartphone: “fear detected” “laugh detected” “anger detected” “disgust detected” “looking left/right”
 ### Week 5
@@ -142,3 +142,10 @@ The error occurs because the code is trying to access DOM elements that don't ex
 - tilt detectie met device orientation -> andere kant kijken
 - desktop ontvangen van emotie en aanpassen van gezicht
 - animaties van emoties van karakter -> lottie
+
+# Code WebRTC communicatie
+## foutmelding - copilot
+ReferenceError: Cannot access 'app' before initialization
+at Object.
+
+-> code fout geplaatst in index.js, app wordt gebruikt voordat het is gedefinieerd.

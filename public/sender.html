@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC</title>
+</head>
+
+<body>
+    <h1>Welcome</h1>
+    <p>Probeer de emotie van het karakter te veranderen door te schudden, te swipen of te tikken.</p>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module">
+        let socket;
+        let myStream;
+        let peer;
+
+        const servers = {
+            iceServers: [{
+                urls: 'stun:stun.l.google.com:19302'
+            }]
+        };
+        
+        const init = async () => {
+            initSocket();
+        };
+
+        const initSocket = () => {
+            socket = io.connect('/');
+            socket.on('connect', () => {
+                console.log(socket.id);
+            });
+            socket.on('signal', async (myId, signal, peerId) => {
+                console.log(`Received signal from ${peerId}`);
+                console.log(signal);
+                peer.signal(signal);
+            });
+        };
+
+        const callPeer = async (peerId) => {
+            peer = new SimplePeer({ initiator: true, stream: myStream });
+            peer.on('signal', data => {
+                socket.emit('signal', peerId, data);
+            });
+        };
+
+        init();
+
+    </script>
+</body>
+
+</html>

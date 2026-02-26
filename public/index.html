@@ -24,7 +24,7 @@
                 socket = io.connect('/');
                 socket.on('connect', () => {
                     console.log(`Connected: ${socket.id}`);
-                    const url = `${new URL(`/controller.html?id=${socket.id}`, window.location)}`;
+                    const url = `${new URL(`/sender.html?id=${socket.id}`, window.location)}`;
                     $url.textContent = url;
                     $url.setAttribute('href', url);
 
@@ -53,4 +53,5 @@
         }
     </script>
 </body>
+
 </html>

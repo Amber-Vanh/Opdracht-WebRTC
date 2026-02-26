@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebRTC</title>
+    <style>
+        video {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Desktop</h1>
+    <script src="/socket.io/socket.io.js"></script>
+    <script type="module">
+        let socket;
+        let peer;
+
+        const servers = {
+            iceServers: [{
+                urls: `stun:stun.l.google.com:19302`
+            }]
+        };
+
+        const init = async () => {
+            initSocket();
+        };
+
+        const initSocket = () => {
+            socket = io.connect(`/`);
+            socket.on(`connect`, () => {
+                console.log(socket.id);
+            });
+            socket.on('signal', async (myId, signal, peerId) => {
+                console.log(`Received signal from ${peerId}`);
+                console.log(signal);
+                if (signal.type === 'offer') {
+                    answerPeerOffer(myId, signal, peerId);
+                }
+                peer.signal(signal);
+            });
+        };
+
+        const answerPeerOffer = async (myId, offer, peerId) => {
+            peer = new SimplePeer();
+            peer.on('signal', data => {
+                socket.emit('signal', peerId, data);
+            });
+        };
+
+        init();
+
+    </script>
+</body>
+
+</html>
