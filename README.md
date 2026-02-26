@@ -26,7 +26,7 @@
 - mag oud schoolproject zijn
 - instructies en besturing duidelijk maken
 - webrtc data channels voor de aansturing
-- Websockets voor ignalling layer
+- Websockets voor signalling layer
 ### Bonuspunten
 - accelerometer = versnelling in 3 assen = kantelbesturing, schuddetectie, jump/ boost
 - gyroscoop = rotatiesnelheid = camera rotaties, vr-achtige dingen
