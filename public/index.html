@@ -42,7 +42,6 @@
                         qr.addData(url);
                         qr.make();
                         document.getElementById('qr').innerHTML = qr.createImgTag(4);
-                        console.log('QR-code succesvol gegenereerd!');
                     } catch (error) {
                         console.error('Fout bij het genereren van QR-code:', error);
                         document.getElementById('qr').innerHTML = `<p style="color: red;">Fout: ${error.message}</p>`;
@@ -54,5 +53,4 @@
         }
     </script>
 </body>
-
 </html>

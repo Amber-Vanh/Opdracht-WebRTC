@@ -1,12 +1,24 @@
 # Planning
 ### Week 2
-Briefing gekregen van de opdracht. Deadline Github link indienen 22 februari. Ook het opstellen van verschillende concepten en het maken van de qr-code link tussen desktop en smartphone doen we voor het eerste consult.
+- Briefing herlezen OK
+- Github aanmaken + indienen OK
+- concepten uitwerken OK
+- qr-code communicatie tussen desktop en gsm OK
 ### Week 3
-Volgende week begin ik met een planning maken voor de rest van het project. Ook noteer ik de feedback van het eerste consult en begin ik met het uitwerken van het uitendelijke concept.
+- planning rest van het project OK
+- concept uitwerken OK
+- core feautures bepalen + onderzoeken OK
+- webrtc communicatie maken 
 ### Week 4
+- Desktop console/log die emoties toont door bewegingen van de smartphone: “fear detected” “laugh detected” “anger detected” “disgust detected” “looking left/right”
 ### Week 5
+- karakter en emoties animeren 
+- gezichtsuitdrukking van het karakter aanpassen aan de emoties
+- overgangen tussen de emoties maken
 ### Week 6
-Deadline 22 maart.
+- gsm ui verbeteren -> duidelijke instructies, minimalistisch design -> css
+- laatste problemen oplossen, testen, finetunen
+- indienen -> deadline 22 maart.
 
 # Briefing
 ### Minimaal
@@ -65,3 +77,68 @@ Gebruik je smartphone om slides op de desktop te besturen.
 
 - pointer laser = beweeg
 - dia veranderen = swipe
+
+# Feedback - 26/02
+Concept 1 is beste
+- maak combi met ml5 waardoor mensen op hun eigen gezicht dingen kunnen doen
+- zorg dat er logica zit achter de gsm-functies dat ze uitvoeren
+
+WebRTC
+- qr-code staat goed
+- surf niet via localhost maar via ip-adres:8080
+- communicatie tussen desktop en gsm via webrtc ipv websockets
+- noteer welk AI-systeem je gebruikt 
+- zorg dat website communicatie tegen volgende week in orde is
+
+# Code qr-code
+## foutmelding
+Copilot -> 
+(index):29 Uncaught (in promise) TypeError: Cannot set properties of null (setting 'textContent')
+at Socket.<anonymous> ((index):29:38)
+at Emitter.emit (index.js:136:20)
+at Socket.onconnect (socket.js:612:14)
+at Socket.onpacket (socket.js:499:26)
+at Emitter.emit (index.js:136:20)
+at manager.js:217:18
+
+### oplossing
+The error occurs because the code is trying to access DOM elements that don't exist in your HTML. At line 29, it's trying to set textContent on an element with id url, but there's no such element in the page.
+
+# Gekozen Concept
+## Desktop 
+= 2d karakter 
+## smartphone 
+= minimalistische ui 
+= "Probeer de emotie van het karkater te veranderen door te schudden, te swipen of te tikken op je scherm. Welke emotie kun jij oproepen?"
+## Emotie mapping
+### Bang = schudden
+- accelerometer detecteert hoge amplitude / random spikes
+- Interpretatie: “chaos → angst”
+- Gezicht: grote ogen, sippe mond, angsige wenkbrauwen
+### Lachen = swipen (kietelen)
+- Input: snelle horizontale of verticale swipes
+- Interpretatie: “kietelen → lachen”
+- lachende mond, vrolijke wenkbrauwen, rode wangen
+### Boos — tikken / hard drukken
+- Input: korte, krachtige taps (touch events)
+- Interpretatie: “prikkel → irritatie → boosheid”
+- Gezicht: fronsende wenkbrauwen, strakke mond
+### Disgust = pinch
+- Input: pinch‑gesture (twee vingers naar elkaar)
+- Interpretatie: “iets vies → terugtrekken”
+- Gezicht: neus optrekken, mondhoeken naar beneden
+### Andere kant kijken = tilt
+- Input: tilt van de telefoon (device orientation)
+- Interpretatie: kantelen -> kijkrichting
+- Gezicht: ogen draaien naar de kant
+
+## Core features
+- qr-code koppeling tussen desktop en smartphone
+- webrtc data channel communicatie
+- accelerometer detectie van schudden -> bang
+- swipe detectie met touch events -> lachen
+- tik detectie met touch events -> boos
+- pinch detectie met touch events en 2 vingers -> disgust
+- tilt detectie met device orientation -> andere kant kijken
+- desktop ontvangen van emotie en aanpassen van gezicht
+- animaties van emoties van karakter -> lottie
