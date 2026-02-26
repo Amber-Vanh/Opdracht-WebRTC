@@ -27,14 +27,7 @@ Deadline 22 maart.
 - camera = qr-scannen, video-overlay, AR-elementen
 
 # Concept
-## Idee 1 - Clicker game
-aanpassingen van clicker game van CC2. Het is een game waarbij je bloemen moet planten en die moet verzorgen, ook komt nu en dan een gnoom in beeld dat je moet verslaan om geen bloemen te verliezen. 
-
-- bloemen planten = klikken
-- gnoom doden = schudden
-- bloemen verzorgen = schudden/ tilt
-
-## Idee 2 - Karakter
+## Idee 1 - Karakter
 Op de desktop staat een klein 2D/3D‑karakter.
 De smartphone stuurt geen knoppen, maar gevoelens via gestures, tilt, snelheid van swipes, of micro‑interacties. 
 
@@ -43,6 +36,13 @@ De smartphone stuurt geen knoppen, maar gevoelens via gestures, tilt, snelheid v
 - boos = tikken
 - disgust = pinch
 - andere kant kijken = tilt
+
+## Idee 2 - Clicker game
+aanpassingen van clicker game van CC2. Het is een game waarbij je bloemen moet planten en die moet verzorgen, ook komt nu en dan een gnoom in beeld dat je moet verslaan om geen bloemen te verliezen. 
+
+- bloemen planten = klikken
+- gnoom doden = schudden
+- bloemen verzorgen = schudden/ tilt
 
 ## Idee 3 - Huisdier
 Een klein digitaal huisdiertje leeft op de desktop. De smartphone fungeert als controller.
