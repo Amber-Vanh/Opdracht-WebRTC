@@ -339,7 +339,7 @@ Het bestand bevat nu zowel de QR code setup als de WebRTC receiver functionalite
 als ik de html, css, javascript wil scheiden van elkaar zou ik de css en javascript bestanden dan in de public moeten plaatsen of?
 
 ### antwoord
-a, precies! Als je de HTML, CSS en JavaScript wilt scheiden, moeten alle bestanden in de public folder staan (of in subfolders binnen public), omdat dat de folder is die door je server publiek toegankelijk wordt gemaakt.
+Ja, precies! Als je de HTML, CSS en JavaScript wilt scheiden, moeten alle bestanden in de public folder staan (of in subfolders binnen public), omdat dat de folder is die door je server publiek toegankelijk wordt gemaakt.
 
 Een veelgebruikte structuur zou zijn:
 public/
@@ -351,3 +351,36 @@ public/
       ├── index.js
       └── sender.js
   
+### Reflectie
+- Ik wist niet zeker hoe het precies moet sinds de algemene index.js file niet in de public folder staan
+- het is beter van te vragen en zeker te zijn dan zelf dingen te proberen en fouten te maken die ik kon vermijden.
+  
+### code aanpassingen
+- aanmaken van css/index.css en css/sender.css
+- aanmaken van js/index.js en js/sender.js
+- verplaatsen van css en javascript code uit index.html en sender.html naar de nieuwe bestanden
+- aanpassen van index.html en sender.html om de nieuwe css en js bestanden te linken
+
+### Het loopt fout
+- bij het overzetten van de code van index.html naar index.js kreeg ik een rood onderlijnd stuk code
+
+### prompt
+hier loopt iets fout, wat is het probleem?
+
+### antwoord
+Ik zie het probleem! De template literal syntax is verkeerd geformatteerd. Er staan overal spaties tussen de $ en {, en tussen andere karakters. Dit zou moeten zijn:
+
+Fout: $ { socket.id }
+Correct: ${socket.id}
+
+Ook in de URL: /sender.html?id= moet zonder spaties.
+
+Laat me het hele bestand corrigeren:
+Opgelost! De problemen waren:
+
+- Template literal syntax: $ {socket.id} moet ${socket.id} zijn (geen spatie tussen $ en {)
+- URL formatting: /sender.html?id= moet zonder spaties
+- Vreemde puntkommas op aparte regels zijn nu correct geplaatst
+- Overbodige witruimte verwijderd
+Het bestand is nu correct geformatteerd en JavaScript zal de template literals nu goed interpreteren.
+
