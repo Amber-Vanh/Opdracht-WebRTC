@@ -18,7 +18,8 @@
 - core feautures bepalen + onderzoeken OK
 - webrtc communicatie maken OK
 ### Week 4
-- html - css = javascript scheiden
+- html - css - javascript scheiden 
+- index.html en receiver.html samenvoegen OK
 - javascript library zoeken (hammer.js) voor touch events
 - checken of iets wel wordt doorgestuurd met button testen
 - schudden detectie maken -> desktop reageert met "fear detected"
@@ -311,3 +312,42 @@ at Object.
 
 -> code fout geplaatst in index.js, app wordt gebruikt voordat het is gedefinieerd.
 
+
+## Samenvoegen van index.html en receiver.html
+### prompt
+Zou je de index.html en receiver.html kunnen samenvoegen in de index.html tot 1 bestand sinds dit over hetzelfde gaat
+
+### antwoord
+Ik zal de bestanden samenvoegen. Beide zijn voor de desktop/receiver kant - een genereert de QR code en de ander
+handelt de WebRTC verbinding af. Ik voeg ze samen in index.html
+
+Klaar! Ik heb index.html bijgewerkt met de functionaliteit van beide bestanden:
+- QR code generatie voor het delen van de verbindings-URL
+- WebRTC verbindingslogica voor het ontvangen van peer signals
+- Styling voor video elementen
+- SimplePeer library toegevoegd (deze ontbrak maar is nodig voor WebRTC)
+
+Het bestand bevat nu zowel de QR code setup als de WebRTC receiver functionaliteit in één overzichtelijk bestand.
+
+### Reflectie
+- Het samenvoegen van de bestanden maakte het overzichtelijker en verminderde de kans op fouten door ontbrekende elementen of variabelen.
+- Door het samenvoegen met Copilot te maken voorkom ik fouten te maken door dingen verkeerd te plaatsen of te vergeten. Ook is dit vlotter dan alles zelf uit te voeren. 
+- Alles werkt dus TOP
+
+## html - css - javascript scheiden
+### prompt
+als ik de html, css, javascript wil scheiden van elkaar zou ik de css en javascript bestanden dan in de public moeten plaatsen of?
+
+### antwoord
+a, precies! Als je de HTML, CSS en JavaScript wilt scheiden, moeten alle bestanden in de public folder staan (of in subfolders binnen public), omdat dat de folder is die door je server publiek toegankelijk wordt gemaakt.
+
+Een veelgebruikte structuur zou zijn:
+public/
+  ├── index.html
+  ├── sender.html
+  ├── css/
+  │   └── style.css
+  └── js/
+      ├── index.js
+      └── sender.js
+  
