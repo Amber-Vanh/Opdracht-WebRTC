@@ -1,3 +1,11 @@
+- [Planning](#planning)
+- [Briefing](#briefing)
+- [Concept](#gekozen-concept)
+- [Feedback](#feedback)
+- [Code](#code)
+
+
+
 # Planning
 ### Week 2
 - Briefing herlezen OK
@@ -10,7 +18,14 @@
 - core feautures bepalen + onderzoeken OK
 - webrtc communicatie maken OK
 ### Week 4
-- Desktop console/log die emoties toont door bewegingen van de smartphone: “fear detected” “laugh detected” “anger detected” “disgust detected” “looking left/right”
+- html - css = javascript scheiden
+- javascript library zoeken (hammer.js) voor touch events
+- checken of iets wel wordt doorgestuurd met button testen
+- schudden detectie maken -> desktop reageert met "fear detected"
+- swipen detectie maken -> desktop reageert met "laugh detected"
+- tikken detectie maken -> desktop reageert met "anger detected"
+- pinch detectie maken -> desktop reageert met "disgust detected"
+- tilt detectie maken -> desktop reageert met "looking left/right"
 ### Week 5
 - karakter en emoties animeren 
 - gezichtsuitdrukking van het karakter aanpassen aan de emoties
@@ -77,32 +92,6 @@ Gebruik je smartphone om slides op de desktop te besturen.
 
 - pointer laser = beweeg
 - dia veranderen = swipe
-
-# Feedback - 26/02
-Concept 1 is beste
-- maak combi met ml5 waardoor mensen op hun eigen gezicht dingen kunnen doen
-- zorg dat er logica zit achter de gsm-functies dat ze uitvoeren
-
-WebRTC
-- qr-code staat goed
-- surf niet via localhost maar via ip-adres:8080
-- communicatie tussen desktop en gsm via webrtc ipv websockets
-- noteer welk AI-systeem je gebruikt 
-- zorg dat website communicatie tegen volgende week in orde is
-
-# Code qr-code
-## foutmelding
-Copilot -> 
-(index):29 Uncaught (in promise) TypeError: Cannot set properties of null (setting 'textContent')
-at Socket.<anonymous> ((index):29:38)
-at Emitter.emit (index.js:136:20)
-at Socket.onconnect (socket.js:612:14)
-at Socket.onpacket (socket.js:499:26)
-at Emitter.emit (index.js:136:20)
-at manager.js:217:18
-
-### oplossing
-The error occurs because the code is trying to access DOM elements that don't exist in your HTML. At line 29, it's trying to set textContent on an element with id url, but there's no such element in the page.
 
 # Gekozen Concept
 ## Desktop 
@@ -278,9 +267,47 @@ function setState(state) {
 }
 ```
 
-# Code WebRTC communicatie
-## foutmelding - copilot
+# Feedback 
+## 26/02
+Concept 1 is beste
+- maak combi met ml5 waardoor mensen op hun eigen gezicht dingen kunnen doen
+- zorg dat er logica zit achter de gsm-functies dat ze uitvoeren
+
+WebRTC
+- qr-code staat goed
+- surf niet via localhost maar via ip-adres:8080
+- communicatie tussen desktop en gsm via webrtc ipv websockets
+- noteer welk AI-systeem je gebruikt 
+- zorg dat website communicatie tegen volgende week in orde is
+
+## 05/03
+- mobile moet initiator zijn, zorgt voor een stap minder => al oke
+- css en javascript scheiden van html
+- idex + receiver samenvoegen tot 1 html bestand
+- vb. als boos -> geluid op gsm -> werken in 2 richtingen
+- reflectie van ai schrijven bij gebruik van ai
+- javascript library gebruiken voor de touch events (hammer.js) -> maakt het makkelijker en betrouwbaarder
+- planning week 4 gedetailleerder maken -> per feature
+
+
+# Code
+## foutmelding qr-code
+Copilot -> 
+(index):29 Uncaught (in promise) TypeError: Cannot set properties of null (setting 'textContent')
+at Socket.<anonymous> ((index):29:38)
+at Emitter.emit (index.js:136:20)
+at Socket.onconnect (socket.js:612:14)
+at Socket.onpacket (socket.js:499:26)
+at Emitter.emit (index.js:136:20)
+at manager.js:217:18
+
+### oplossing
+The error occurs because the code is trying to access DOM elements that don't exist in your HTML. At line 29, it's trying to set textContent on an element with id url, but there's no such element in the page.
+
+## foutmelding WebRTC communicatie
+Copilot ->
 ReferenceError: Cannot access 'app' before initialization
 at Object.
 
 -> code fout geplaatst in index.js, app wordt gebruikt voordat het is gedefinieerd.
+
