@@ -143,6 +143,141 @@ The error occurs because the code is trying to access DOM elements that don't ex
 - desktop ontvangen van emotie en aanpassen van gezicht
 - animaties van emoties van karakter -> lottie
 
+## Voorbeeld code (copilot generated)
+### bang = shake detectie
+```javascript
+let lastShake = 0;
+
+window.addEventListener("devicemotion", (e) => {
+  const acc = e.accelerationIncludingGravity;
+  const magnitude = Math.sqrt(acc.x**2 + acc.y**2 + acc.z**2);
+
+  if (magnitude > 25 && Date.now() - lastShake > 500) {
+    lastShake = Date.now();
+    sendEmotion("fear", magnitude / 30);
+  }
+});
+```
+
+### lachen = swipe detectie
+```javascript
+let startX = 0;
+let startY = 0;
+let startTime = 0;
+
+window.addEventListener("touchstart", (e) => {
+  const t = e.touches[0];
+  startX = t.clientX;
+  startY = t.clientY;
+  startTime = Date.now();
+});
+
+window.addEventListener("touchend", (e) => {
+  const t = e.changedTouches[0];
+  const dx = t.clientX - startX;
+  const dy = t.clientY - startY;
+  const dt = Date.now() - startTime;
+
+  const distance = Math.sqrt(dx*dx + dy*dy);
+  const velocity = distance / dt;
+
+  if (velocity > 0.5) {
+    sendEmotion("laugh", Math.min(velocity, 2));
+  }
+});
+```
+
+### boos = tap detectie
+```javascript
+window.addEventListener("touchstart", () => {
+  this.touchStartTime = Date.now();
+});
+
+window.addEventListener("touchend", () => {
+  const duration = Date.now() - this.touchStartTime;
+
+  if (duration < 150) {
+    sendEmotion("anger", 1);
+  }
+});
+```
+
+### disgust = pinch detectie
+```javascript
+let initialDistance = null;
+
+window.addEventListener("touchmove", (e) => {
+  if (e.touches.length === 2) {
+    const [t1, t2] = e.touches;
+    const dx = t1.clientX - t2.clientX;
+    const dy = t1.clientY - t2.clientY;
+    const distance = Math.sqrt(dx*dx + dy*dy);
+
+    if (!initialDistance) initialDistance = distance;
+
+    if (distance < initialDistance * 0.7) {
+      sendEmotion("disgust", 1);
+    }
+  }
+});
+
+window.addEventListener("touchend", () => {
+  initialDistance = null;
+});
+```
+
+### andere kant kijken = tilt detectie
+```javascript
+window.addEventListener("deviceorientation", (e) => {
+  const gamma = e.gamma; // -45 = links, +45 = rechts
+
+  if (gamma < -10) sendEmotion("look_left", Math.abs(gamma) / 45);
+  if (gamma > 10) sendEmotion("look_right", gamma / 45);
+});
+```
+
+### desktop 
+```javascript
+function handleEmotion(type, intensity) {
+  switch(type) {
+    case "fear":
+      character.setState("fear", intensity);
+      break;
+    case "laugh":
+      character.setState("laugh", intensity);
+      break;
+    case "anger":
+      character.setState("anger");
+      break;
+    case "disgust":
+      character.setState("disgust");
+      break;
+    case "look_left":
+      character.lookLeft(intensity);
+      break;
+    case "look_right":
+      character.lookRight(intensity);
+      break;
+  }
+}
+```
+
+### karakter animaties
+```javascript
+const animations = {
+  idle: lottie.loadAnimation({ container: el, path: "idle.json" }),
+  fear: lottie.loadAnimation({ container: el, path: "fear.json" }),
+  laugh: lottie.loadAnimation({ container: el, path: "laugh.json" }),
+  anger: lottie.loadAnimation({ container: el, path: "anger.json" }),
+  disgust: lottie.loadAnimation({ container: el, path: "disgust.json" }),
+};
+
+function setState(state) {
+  Object.values(animations).forEach(a => a.stop());
+  animations[state].play();
+}
+```
+
 # Code WebRTC communicatie
 ## foutmelding - copilot
 ReferenceError: Cannot access 'app' before initialization
