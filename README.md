@@ -1,10 +1,9 @@
 - [Planning](#planning)
 - [Briefing](#briefing)
 - [Concept](#gekozen-concept)
+- [Hammer.js](#hammerjs)
 - [Feedback](#feedback)
 - [Code](#code)
-
-
 
 # Planning
 ### Week 2
@@ -18,7 +17,7 @@
 - core feautures bepalen + onderzoeken OK
 - webrtc communicatie maken OK
 ### Week 4
-- html - css - javascript scheiden 
+- html - css - javascript scheiden OK
 - index.html en receiver.html samenvoegen OK
 - javascript library zoeken (hammer.js) voor touch events
 - checken of iets wel wordt doorgestuurd met button testen
@@ -33,6 +32,7 @@
 - overgangen tussen de emoties maken
 ### Week 6
 - gsm ui verbeteren -> duidelijke instructies, minimalistisch design -> css
+- extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop)
 - laatste problemen oplossen, testen, finetunen
 - indienen -> deadline 22 maart.
 
@@ -267,6 +267,33 @@ function setState(state) {
   animations[state].play();
 }
 ```
+# Hammer.js
+Hammer is a open-source library that can recognize gestures made by touch, mouse and pointerEvents.
+
+## usage
+By default it adds a set of tap, doubletap, press, horizontal pan and swipe, and the multi-touch pinch and rotate recognizers
+
+viewport meta tag is recommended, it gives more control back to the webpage by disabling the doubletap/pinch zoom.
+``` html
+<meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+```
+
+```
+npm install hammerjs
+```
+
+## Gebruiken in project
+```
+import Hammer from 'hammerjs';
+
+const element = document.getElementById('my-element');
+const hammer = new Hammer(element);
+
+hammer.on('pan', (ev) => {
+  console.log(ev);
+});
+```
+
 
 # Feedback 
 ## 26/02
@@ -383,4 +410,22 @@ Opgelost! De problemen waren:
 - Vreemde puntkommas op aparte regels zijn nu correct geplaatst
 - Overbodige witruimte verwijderd
 Het bestand is nu correct geformatteerd en JavaScript zal de template literals nu goed interpreteren.
+
+-> Hetzelfde probleem had ik ook bij sender.js, dus dat heb ik ook aangepast met AI.
+
+### Reflectie
+- het probleem was dat sinds ik code kopieerde van html naar javascript dat er rare spacing werd gebruikt
+- het is vlotter om dit aan te passen met AI dan dit zelf uit te zoeken aangezien ik wist waar de fout zat maar niet hoe ik dit moest oplossen
+
+## Emoties toevoegen
+### Hammerjs toevoegen
+- npm install hammerjs
+- html aanpassen
+  ```html
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+  ```
+- import hammer in sender.js
+  ```javascript
+  import Hammer from 'hammerjs';
+  ```
 
