@@ -1,6 +1,7 @@
 let socket;
 const $url = document.getElementById('url');
 const $qr = document.getElementById('qr');
+const $emoties = document.getElementById('emoties');
 let currentPeer = null;
 
 // Initialize socket connection
@@ -59,9 +60,24 @@ const connectPeer = (peerId) => {
     });
 
     peer.on('data', data => {
+        console.log('Received data:', data.toString());
         const message = JSON.parse(data.toString());
         if (message.type === 'button') {
             console.log(`Button ${message.value} pressed via WebRTC!`);
+        }
+        if (message.type === 'shake') {
+            console.log('Shake detected via WebRTC!');
+            if ($emoties) {
+                $emoties.textContent = 'fear detected';
+                $emoties.style.display = 'block';
+            }
+        }
+        if (message.type === 'swipe') {
+            console.log('Swipe detected via WebRTC!');
+            if ($emoties) {
+                $emoties.textContent = 'laugh detected';
+                $emoties.style.display = 'block';
+            }
         }
     });
 

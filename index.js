@@ -5,6 +5,7 @@ const server = require('http').Server(app);
 const port = process.env.PORT || 8080;
 
 app.use(express.static('public'));
+app.use('/node_modules', express.static('node_modules'));
 server.listen(port, () => {
   console.log(`App listening on port ${port}!`);
 });

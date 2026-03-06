@@ -1,4 +1,3 @@
-//import Hammer from 'hammerjs';
 const $peerSelect = document.getElementById('peerSelect');
 const $button = document.getElementById('testButton');
 
@@ -32,13 +31,13 @@ const createPeer = () => {
     });
 };
 
-
 const getUrlParameter = (name) => {
     const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
     const results = regex.exec(location.search);
     return results === null ? false : decodeURIComponent(results[1].replace(/\+/g, ' '));
 };
 
+//test button
 const TestButton = () => {
     $button.addEventListener('click', () => {
         if (peer && peer.connected) {
@@ -47,10 +46,71 @@ const TestButton = () => {
     });
 };
 
+// BANG
+const setupShakeDetection = () => {
+    let lastX = null;
+    let lastY = null;
+    let lastZ = null;
+    let lastTime = 0;
+
+    window.addEventListener("devicemotion", (event) => {
+        const acc = event.accelerationIncludingGravity;
+        const currentTime = Date.now();
+
+        if ((currentTime - lastTime) > 100) {
+            const deltaX = Math.abs(acc.x - (lastX || 0));
+            const deltaY = Math.abs(acc.y - (lastY || 0));
+            const deltaZ = Math.abs(acc.z - (lastZ || 0));
+
+            if (deltaX + deltaY + deltaZ > 10) {
+                console.log("Shake detected!");
+                if (peer && peer.connected) {
+                    peer.send(JSON.stringify({ type: "shake", emotion: "fear" }));
+                }
+            }
+
+            lastX = acc.x;
+            lastY = acc.y;
+            lastZ = acc.z;
+            lastTime = currentTime;
+        }
+    });
+};
+
+const swipeDetection = () => {
+    const hammer = new Hammer(document.body);
+
+    // Configure swipe recognizer
+    hammer.get('swipe').set({
+        direction: Hammer.DIRECTION_ALL,
+        threshold: 1,
+        velocity: 0.3
+    });
+
+    hammer.on('swipe', (event) => {
+        console.log("Swipe detected!", event.direction);
+        if (peer && peer.connected) {
+            let direction = 'unknown';
+            if (event.direction === Hammer.DIRECTION_LEFT) direction = 'left';
+            if (event.direction === Hammer.DIRECTION_RIGHT) direction = 'right';
+            if (event.direction === Hammer.DIRECTION_UP) direction = 'up';
+            if (event.direction === Hammer.DIRECTION_DOWN) direction = 'down';
+
+            peer.send(JSON.stringify({
+                type: "swipe",
+                emotion: "laugh",
+                direction: direction
+            }));
+        }
+    });
+};
+
+
 const init = () => {
     TestButton();
+    setupShakeDetection();
+    swipeDetection();
 
-    
     targetSocketId = getUrlParameter('id');
     if (!targetSocketId) {
         alert('Missing target ID in querystring');

@@ -21,8 +21,8 @@
 - index.html en receiver.html samenvoegen OK
 - javascript library zoeken (hammer.js) voor touch events OK
 - checken of iets wel wordt doorgestuurd OK
-- schudden detectie maken -> desktop reageert met "fear detected"
-- swipen detectie maken -> desktop reageert met "laugh detected"
+- schudden detectie maken -> desktop reageert met "fear detected" -> PROBLEEM
+- swipen detectie maken -> desktop reageert met "laugh detected" 
 - tikken detectie maken -> desktop reageert met "anger detected"
 - pinch detectie maken -> desktop reageert met "disgust detected"
 - tilt detectie maken -> desktop reageert met "looking left/right"
@@ -566,5 +566,153 @@ const peer = new SimplePeer({
 -> BUTTON WERKT
 
 ## Shake detectie -> Bang
+De eerste emotie doe ik met AI zodat ik snap hoe het in elkaar zit met de hammerjs erbij
 
+### prompt
+Ik wil dat wanneer met de gsm geschud wordt dat op de desktop een tekstje komt "fear detected" in de div met id="emoties". doe deze communicatie met webrtc en doe de shake detectie met hammerjs
+
+### antwoord
+index.js:8: Static route toegevoegd voor node_modules folder
+sender.html:19: CDN vervangen door hammer.min.js
+
+Sender.js:
+```javascript
+const setupShakeDetection = () => {
+    const hammer = new Hammer(document.body);
+    hammer.on('shake', () => {
+        console.log('Shake detected!');
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({ type: 'shake', emotion: 'fear' }));
+        }
+    });
+};
+```
+Index2.js:
+```javascript
+    peer.on('data', data => {
+        const message = JSON.parse(data.toString());
+        if (message.type === 'button') {
+            console.log(`Button ${message.value} pressed via WebRTC!`);
+        } else if (message.type === 'shake') {
+            console.log('Shake detected via WebRTC!');
+            if ($emoties) {
+                $emoties.textContent = 'fear detected';
+                $emoties.style.display = 'block';
+            }
+        }
+    });
+```
+
+### Foutmelding
+Uncaught SyntaxError: Cannot use import statement outside a module (Sender.js:1)
+
+Sender.js:1
+``` javascript
+  import Hammer from 'hammerjs';
+```
+-> verwijderen en toevoegen in de sender.html
+```html
+  <script src="/node_modules/hammerjs/hammer.min.js"></script>
+```
+
+### Probleem
+- shake detectie werkt niet via hammerjs
+- handmatig maken van een shake event
+
+#### index2.js:
+```javascript
+    if (message.type === 'shake') {
+      console.log('Shake detected via WebRTC!');
+      if ($emoties) {
+        $emoties.textContent = 'fear detected';
+        $emoties.style.display = 'block';
+      }
+    }
+```
+
+#### sender.js:
+```javascript
+const setupShakeDetection = () => {
+    let lastX = null;
+    let lastY = null;
+    let lastZ = null;
+    let lastTime = 0;
+
+    window.addEventListener("devicemotion", (event) => {
+        const acc = event.accelerationIncludingGravity;
+        const currentTime = Date.now();
+
+        if ((currentTime - lastTime) > 100) {
+            const deltaX = Math.abs(acc.x - (lastX || 0));
+            const deltaY = Math.abs(acc.y - (lastY || 0));
+            const deltaZ = Math.abs(acc.z - (lastZ || 0));
+
+            if (deltaX + deltaY + deltaZ > 25) {
+                console.log("Shake detected!");
+                if (peer && peer.connected) {
+                    peer.send(JSON.stringify({ type: "shake", emotion: "fear" }));
+                }
+            }
+
+            lastX = acc.x;
+            lastY = acc.y;
+            lastZ = acc.z;
+            lastTime = currentTime;
+        }
+    });
+};
+```
+
+### Reflectie op AI gebruik
+- de code voor sender.js zou ik echt nooit zelf kunnen schrijven
+
+### Shake werkt niet
+Prompt:
+- het stuurt geen bericht uit of de desktop ontvangt geen bericht bij het versturen van de shakedetectie
+
+Oplossing:
+- console logs toevoegen -> kan je niet zien op mobile dus nutteloos
+- ook na aanpassingen lijkt het niet te werken
+- vragen op consult volgende week
+
+## Swipe detectie -> lachen
+#### sender.js
+```javascript
+const swipeDetection = () => {
+    const hammer = new Hammer(document.body);
+    hammer.on('swipe', (event) => {
+        console.log("Swipe detected!");
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({ type: "swipe", emotion: "laugh" }));
+        }
+    });
+};
+```
+-> voorbeeld van hammerjs gevolgd om dit te bekomen
+
+#### index2.js
+``` javascript
+if (message.type === 'swipe') {
+  console.log('Swipe detected via WebRTC!');
+  if ($emoties) {
+    $emoties.textContent = 'laugh detected';
+    $emoties.style.display = 'block';
+  }
+}
+```
+
+### Probleem -> werkt niet
+Ik heb de swipe detectie verbeterd in sender.js:80-101:
+
+Wijzigingen:
+- Swipe recognizer expliciet geconfigureerd met alle richtingen (left, right, up, down)
+- Lagere threshold (10) en velocity (0.3) voor meer gevoeligheid
+- Swipe richting wordt nu meegestuurd
+
+Mogelijke oorzaken waarom het niet werkte:
+- Hammer.js swipe recognizer had geen configuratie
+- Default threshold was te hoog
+- Alleen horizontale swipes waren mogelijk
+
+Test door op je telefoonscherm te swipen (niet schudden). Je zou nu "laugh detected" moeten zien op de desktop.
 
