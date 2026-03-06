@@ -97,6 +97,13 @@ const connectPeer = (peerId) => {
                 $emoties.style.display = 'block';
             }
         }
+        if (message.type === 'tilt') {
+            console.log('Tilt detected via WebRTC!');
+            if ($emoties) {
+                $emoties.textContent = 'looking detected';
+                $emoties.style.display = 'block';
+            }
+        }
     });
 
     return peer;

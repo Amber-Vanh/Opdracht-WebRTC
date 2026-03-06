@@ -5,6 +5,17 @@ const socket = io();
 let targetSocketId;
 let peer;
 
+// permission voor tilt en shake
+if (navigator.permissions) {
+    navigator.permissions.query({ name: "accelerometer" }).then(res => {
+        document.getElementById("debug").textContent = "Accelerometer: " + res.state;
+    });
+
+    navigator.permissions.query({ name: "gyroscope" }).then(res => {
+        document.getElementById("debug").textContent += " | Gyroscope: " + res.state;
+    });
+}
+
 
 // WebRTC setup
 const createPeer = () => {
@@ -153,16 +164,61 @@ const pinchDetection = () => {
     });
 };
 
-// TITL
-const TiltDetection = () => {
-    const hammer = new Hammer(document.body);
-    hammer.on('rotate', (event) => {
-        console.log("Tilt detected!");
-        if (peer && peer.connected) {
-            peer.send(JSON.stringify({ type: "tilt", emotion: "looking" }));
-        }
-    });
+// TILT
+const tiltDetection = () => {
+    const startTilt = () => {
+        const debug = document.getElementById("debug");
+
+        window.addEventListener("deviceorientation", (event) => {
+            //debug
+            debug.textContent = `beta: ${beta}, gamma: ${gamma}`;
+
+            const beta = event.beta;   // voor/achter
+            const gamma = event.gamma; // links/rechts
+
+            if (beta === null || gamma === null) return;
+
+            const tiltThreshold = 15;
+
+            if (Math.abs(beta) > tiltThreshold || Math.abs(gamma) > tiltThreshold) {
+                console.log("Tilt detected!");
+
+                if (peer && peer.connected) {
+                    peer.send(JSON.stringify({ type: "tilt", emotion: "looking" }));
+                }
+            }
+        });
+
+        console.log("Tilt detection active");
+    };
+
+    // iPhone: toestemming nodig
+    if (typeof DeviceOrientationEvent !== "undefined" &&
+        typeof DeviceOrientationEvent.requestPermission === "function") {
+
+        const btn = document.createElement("button");
+        btn.textContent = "Enable Tilt";
+        btn.style.fontSize = "20px";
+        btn.style.padding = "10px";
+        document.body.appendChild(btn);
+
+        btn.addEventListener("click", () => {
+            DeviceOrientationEvent.requestPermission().then(response => {
+                if (response === "granted") {
+                    btn.remove();
+                    startTilt();
+                } else {
+                    alert("Tilt permission denied");
+                }
+            });
+        });
+
+    } else {
+        // Android / desktop browsers
+        startTilt();
+    }
 };
+
 
 const init = () => {
     TestButton();
@@ -170,7 +226,7 @@ const init = () => {
     swipeDetection();
     tapDetection();
     pinchDetection();
-    TiltDetection();
+    tiltDetection();
 
     targetSocketId = getUrlParameter('id');
     if (!targetSocketId) {

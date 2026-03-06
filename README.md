@@ -899,4 +899,31 @@ if (message.type === 'tilt') {
 }
 ```
 
-### 
+### werkt niet
+-> ik dacht dat ik de rotate event van hammerjs ging kunnen gebruiken maar blijkbaar werkt dit niet zo
+
+De tilt detectie is gerepareerd! Het probleem was dat Hammer.js 'rotate' voor screen gestures is, niet voor device tilt.
+
+Wijzigingen in sender.js:157-210:
+- Gebruikt nu DeviceOrientation API in plaats van Hammer.js
+- Detecteert wanneer telefoon > 60° gekanteld is
+- Leest beta (X-as) en gamma (Y-as) rotatie
+- iOS permission handling toegevoegd (tap scherm om toe te staan)
+- Throttling van 500ms om spam te voorkomen
+
+Test het:
+- Herstart de server
+- Op iOS: tap het scherm één keer om orientation permission te geven
+- Kantel je telefoon naar links/rechts of voor/achter
+- Bij > 60° tilt verschijnt "looking detected" op desktop
+- De tilt werkt alleen met fysiek kantelen van de telefoon, niet met screen gestures!
+
+### NOG altijd niet
+-> console.log("DEBUG tilt:", event.beta, event.gamma, event.alpha);
+
+- debug om te zien of je tilt waarden binnen krijgt
+- blijkt dat zowel tilt als shake denied worden
+- website moet op https draaien om dit te kunnen oplossen
+
+## https gebruiken
+
