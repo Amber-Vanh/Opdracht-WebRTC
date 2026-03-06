@@ -48,6 +48,9 @@ const TestButton = () => {
 };
 
 const init = () => {
+    TestButton();
+
+    
     targetSocketId = getUrlParameter('id');
     if (!targetSocketId) {
         alert('Missing target ID in querystring');
@@ -62,7 +65,6 @@ socket.on('signal', (peerId, signal) => {
     if (!peer) createPeer();
     peer.signal(signal);
 });
-
 
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);

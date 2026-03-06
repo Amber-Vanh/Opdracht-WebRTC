@@ -560,6 +560,11 @@ const peer = new SimplePeer({
 - als ik via 4G en dan persoonlijke hotspot verbindt, werkt alles wel
 - 3 uur van mijn leven verspild aan een probleem die er eigenlijk niet was
 
-## Shake detectie -> bang
+### test button
+- nu dat de WebRTC verbinding werkt, kan ik eindelijk testen of de test button ook werkt
+
+-> BUTTON WERKT
+
+## Shake detectie -> Bang
 
 
