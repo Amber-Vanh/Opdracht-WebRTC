@@ -1,41 +1,71 @@
-import Hammer from 'hammerjs';
-let socket;
-let myStream;
+//import Hammer from 'hammerjs';
+const $peerSelect = document.getElementById('peerSelect');
+const $button = document.getElementById('testButton');
+
+const socket = io();
+let targetSocketId;
 let peer;
 
-const servers = {
-    iceServers: [{
-        urls: 'stun:stun.l.google.com:19302'
-    }]
-};
 
-const init = async () => {
-    initSocket();
-};
-
-const initSocket = () => {
-    socket = io.connect('/');
-
-    socket.on('connect', () => {
-        console.log(socket.id);
-    });
-
-    socket.on('signal', async (myId, signal, peerId) => {
-        console.log(`Received signal from ${peerId}`);
-        console.log(signal);
-        peer.signal(signal);
-    });
-};
-
-const callPeer = async (peerId) => {
+// WebRTC setup
+const createPeer = () => {
     peer = new SimplePeer({
-        initiator: true,
-        stream: myStream
+        initiator: false,
+        trickle: true,
+        config: {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+            ]
+        }
     });
 
     peer.on('signal', data => {
-        socket.emit('signal', peerId, data);
+        socket.emit('signal', targetSocketId, data);
+    });
+
+    peer.on('connect', () => {
+        console.log(`Connected to desktop!`);
+    });
+
+    peer.on('error', err => {
+        console.error("Peer error:", err);
     });
 };
 
-init();
+
+const getUrlParameter = (name) => {
+    const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    const results = regex.exec(location.search);
+    return results === null ? false : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+
+const TestButton = () => {
+    $button.addEventListener('click', () => {
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({ type: 'button', value: 'test' }));
+        }
+    });
+};
+
+const init = () => {
+    targetSocketId = getUrlParameter('id');
+    if (!targetSocketId) {
+        alert('Missing target ID in querystring');
+        return false;
+    }
+
+    socket.emit('peerReady', targetSocketId);
+    return true;
+};
+
+socket.on('signal', (peerId, signal) => {
+    if (!peer) createPeer();
+    peer.signal(signal);
+});
+
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}

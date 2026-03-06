@@ -19,8 +19,8 @@
 ### Week 4
 - html - css - javascript scheiden OK
 - index.html en receiver.html samenvoegen OK
-- javascript library zoeken (hammer.js) voor touch events
-- checken of iets wel wordt doorgestuurd met button testen
+- javascript library zoeken (hammer.js) voor touch events OK
+- checken of iets wel wordt doorgestuurd OK
 - schudden detectie maken -> desktop reageert met "fear detected"
 - swipen detectie maken -> desktop reageert met "laugh detected"
 - tikken detectie maken -> desktop reageert met "anger detected"
@@ -271,7 +271,14 @@ function setState(state) {
 Hammer is a open-source library that can recognize gestures made by touch, mouse and pointerEvents.
 
 ## usage
-By default it adds a set of tap, doubletap, press, horizontal pan and swipe, and the multi-touch pinch and rotate recognizers
+By default it adds a set of recognisers for common gestures:
+- tap
+- doubletap
+- press
+- horizontal pan
+- swipe
+- the multi-touch pinch
+- rotate
 
 viewport meta tag is recommended, it gives more control back to the webpage by disabling the doubletap/pinch zoom.
 ``` html
@@ -428,4 +435,131 @@ Het bestand is nu correct geformatteerd en JavaScript zal de template literals n
   ```javascript
   import Hammer from 'hammerjs';
   ```
+
+## Button voor testing van communicatie
+- in sender.html een button toevoegen
+```html
+<button id="testButton">Test Message</button>
+```
+- in sender.js event listener toevoegen voor de button
+```javascript
+document.getElementById('testButton').addEventListener('click', () => {
+  socket.emit('testMessage', desktopId, 'Hello from the sender!');
+});
+```
+- in index.js event listener toevoegen voor 'testMessage'
+```javascript
+socket.on('testMessage', (desktopId, message) => {
+  console.log(`Test message from ${socket.id} to ${desktopId}: ${message}`);
+  io.to(desktopId).emit('testMessage', message);
+});
+```
+- in index.html event listener toevoegen voor ontvangen van 'testMessage'
+```javascript
+socket.on('testMessage', (message) => {
+  const messageDiv = document.getElementById('message');
+  messageDiv.textContent = `Received test message: ${message}`;
+  messageDiv.style.display = 'block';
+});
+```
+### Foutmelding
+sender.js:15 Uncaught ReferenceError: desktopId is not defined
+    at HTMLButtonElement.<anonymous> (sender.js:15:36)
+
+-> DesktopId is niet gedefnieerd in sender.js
+
+### Oplossing
+Ik zie het probleem - de testMessage handler staat verkeerd in de client-side index.js. Dit moet op de server gebeuren. Laat me dit oplossen:
+Opgelost! De problemen waren:
+- desktopId niet gedeclareerd - Deze wordt nu uit de URL parameters gehaald in sender.js
+- Message handler stond verkeerd - Was in client-side code, moet op de server staan in index.js
+- Message div ontbrak - Toegevoegd aan index.html
+
+Nu werkt de flow correct:
+- Sender button → Socket.IO → Server → Socket.IO → Desktop
+- Desktop toont bericht gedurende 5 seconden
+
+### Werkt niet -> fout met connectie
+- bij het klikken op de test button in sender.html krijg ik geen console log in index.html en ook geen bericht te zien op de desktop
+- WebRTC peer connectie niet beschikbaar of niet verbonden
+
+Hulp van Copilot om probleem op te lossen:
+- heel wat console logs om te zien waar het fout gaat
+- foutmelding die bleef terugkeren
+  installHook.js:1 ❌ Peer error: Error: Connection failed.
+    at p._onConnectionStateChange (simplepeer.min.js:6:91542)
+    at _pc.onconnectionstatechange (simplepeer.min.js:6:81452)
+- dit betekent dat de WebRTC verbinding niet tot stand komt, waardoor de socket communicatie ook niet werkt
+
+-> Fout bleef optreden
+-> helemaal opnieuw begonnen
+- opnieuw begonnen met een schone index.html en sender.html
+- stap voor stap de code toegevoegd en getest
+- eerst qr-code communicatie getest -> werkte
+- daarna de test button toegevoegd 
+
+### nieuwe error
+Error: ENOENT: no such file or directory, open './localhost.key'
+    at Object.openSync (node:fs:561:18)
+    at Object.readFileSync (node:fs:445:35)
+    at Object.<anonymous> (/Users/ambervanhooren/Desktop/CC4/Opdracht - webRTC/index.js:6:11)
+    at Module._compile (node:internal/modules/cjs/loader:1706:14)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: './localhost.key'
+}
+
+-> oplossing
+De server probeerde HTTPS te gebruiken maar de SSL certificaten bestaan niet. Ik heb het gewijzigd naar HTTP voor lokale ontwikkeling.
+
+### Volgende foutmelding
+simplepeer.min.js:6 Uncaught Error: Connection failed.
+    at p._onConnectionStateChange (simplepeer.min.js:6:91542)
+    at _pc.onconnectionstatechange (simplepeer.min.js:6:81452)
+
+-> fout EINDELIJK gevonden
+``` javascript
+config: {
+    iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        {
+            urls: 'turn:your-turn-server.com:3478',
+            username: 'user',
+            credential: 'pass'
+        }
+    ]
+}
+```
+MOET IN peer = new SimplePeer({ initiator: true, config: { iceServers: [...] } }) staan
+``` javascript
+const peer = new SimplePeer({
+        initiator: true,
+        trickle: true,
+        config: {
+            iceServers: [
+                { urls: 'stun:stun.l.google.com:19302' },
+                {
+                    urls: 'turn:your-turn-server.com:3478',
+                    username: 'user',
+                    credential: 'pass'
+                }
+            ]
+        }
+    });
+```
+-> NOPE nog altijd foutmeling
+-> PROBLEEM EINDELIJK GEVONDEN
+- Blijkt dat op de wifi bij mij thuis extra beveiliging is waardoor WebRTC verbindingen worden geblokkeerd.
+- als ik via 4G en dan persoonlijke hotspot verbindt, werkt alles wel
+- 3 uur van mijn leven verspild aan een probleem die er eigenlijk niet was
+
+## Shake detectie -> bang
+
 

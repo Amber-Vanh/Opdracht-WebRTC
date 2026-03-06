@@ -1,36 +1,47 @@
-require('dotenv').config();
-const isDevelopment = (process.env.NODE_ENV === 'development');
 const express = require('express');
+require('dotenv').config();
 const app = express();
-const fs = require('fs');
-let options = {};
-if (isDevelopment) {
-  options = {
-    key: fs.readFileSync('./localhost.key'),
-    cert: fs.readFileSync('./localhost.crt')
-  };
-}
-const server = require(isDevelopment ? 'https' : 'http').Server(options, app);
+const server = require('http').Server(app);
 const port = process.env.PORT || 8080;
+
 app.use(express.static('public'));
 server.listen(port, () => {
   console.log(`App listening on port ${port}!`);
 });
 
-const { Server } = require("socket.io");
-const io = new Server(server);
+const io = require('socket.io')(server);
 
+// Globals
 const clients = {};
-io.on('connection', socket => {
-  clients[socket.id] = { id: socket.id };
-  socket.on('disconnect', () => {
-    delete clients[socket.id];
-    io.emit('clients', clients);
-  });
-  socket.on('signal', (peerId, signal) => {
-    console.log(`Received signal from ${socket.id} to ${peerId}`);
-    io.to(peerId).emit('signal', peerId, signal, socket.id);
-  });
-  io.emit('clients', clients);
 
+// socket event handlers
+const handleConnection = (socket) => {
+  clients[socket.id] = { id: socket.id };
+  console.log(`Client connected: ${socket.id}`);
+  io.emit('clients', clients);
+};
+
+const handleDisconnect = (socket) => {
+  delete clients[socket.id];
+  console.log(`Client disconnected: ${socket.id}`);
+  io.emit('clients', clients);
+};
+
+const handleSignal = (socket, peerId, signal) => {
+  console.log(`Signal from ${socket.id} to ${peerId}`);
+  io.to(peerId).emit('signal', peerId, signal, socket.id);
+};
+
+const handlePeerReady = (socket, peerId) => {
+  console.log(`Peer ${socket.id} is ready for ${peerId}`);
+  io.to(peerId).emit('peerReady', socket.id);
+};
+
+// Socket connection
+io.on('connection', socket => {
+  handleConnection(socket);
+
+  socket.on('disconnect', () => handleDisconnect(socket));
+  socket.on('signal', (peerId, signal) => handleSignal(socket, peerId, signal));
+  socket.on('peerReady', peerId => handlePeerReady(socket, peerId));
 });
