@@ -166,57 +166,31 @@ const pinchDetection = () => {
 
 // TILT
 const tiltDetection = () => {
-    const startTilt = () => {
-        const debug = document.getElementById("debug");
+    let lastTiltTime = 0;
 
-        window.addEventListener("deviceorientation", (event) => {
-            //debug
-            debug.textContent = `beta: ${beta}, gamma: ${gamma}`;
+    window.addEventListener("deviceorientation", (event) => {
+        const beta = event.beta;
+        const gamma = event.gamma;
 
-            const beta = event.beta;   // voor/achter
-            const gamma = event.gamma; // links/rechts
+        if (beta === null || gamma === null) return;
 
-            if (beta === null || gamma === null) return;
+        const tiltThreshold = 30;
+        const now = Date.now();
 
-            const tiltThreshold = 15;
+        // cooldown van 500ms = niet constant detecteren
+        if (now - lastTiltTime < 500) return;
 
-            if (Math.abs(beta) > tiltThreshold || Math.abs(gamma) > tiltThreshold) {
-                console.log("Tilt detected!");
+        if (Math.abs(beta) > tiltThreshold || Math.abs(gamma) > tiltThreshold) {
+            lastTiltTime = now;
 
-                if (peer && peer.connected) {
-                    peer.send(JSON.stringify({ type: "tilt", emotion: "looking" }));
-                }
+            if (peer && peer.connected) {
+                peer.send(JSON.stringify({
+                    type: "tilt",
+                    emotion: "looking"
+                }));
             }
-        });
-
-        console.log("Tilt detection active");
-    };
-
-    // iPhone: toestemming nodig
-    if (typeof DeviceOrientationEvent !== "undefined" &&
-        typeof DeviceOrientationEvent.requestPermission === "function") {
-
-        const btn = document.createElement("button");
-        btn.textContent = "Enable Tilt";
-        btn.style.fontSize = "20px";
-        btn.style.padding = "10px";
-        document.body.appendChild(btn);
-
-        btn.addEventListener("click", () => {
-            DeviceOrientationEvent.requestPermission().then(response => {
-                if (response === "granted") {
-                    btn.remove();
-                    startTilt();
-                } else {
-                    alert("Tilt permission denied");
-                }
-            });
-        });
-
-    } else {
-        // Android / desktop browsers
-        startTilt();
-    }
+        }
+    });
 };
 
 

@@ -968,3 +968,100 @@ Error: ENOENT: no such file or directory, open '/localhost.key'
 - de foutmelding kwam door een typfout in het pad van de naam van het certificaat
 
 ### Shake werkt al, tilt nog niet
+-> tilt versimpelen om te zien waar het probleem zit
+```javascript
+const tiltDetection = () => {
+    const debug = document.getElementById("debug");
+
+    window.addEventListener("deviceorientation", (event) => {
+        debug.textContent = `beta: ${event.beta}, gamma: ${event.gamma}`;
+    });
+};
+```
+-> tilt wordt gedetecteerd dus OK
+
+```javascript
+const tiltDetection = () => {
+    const debug = document.getElementById("debug");
+    let lastTiltTime = 0;
+
+    window.addEventListener("deviceorientation", (event) => {
+        const beta = event.beta;
+        const gamma = event.gamma;
+
+        debug.textContent = `beta: ${beta}, gamma: ${gamma}`;
+
+        if (beta === null || gamma === null) return;
+
+        const tiltThreshold = 15;
+        const now = Date.now();
+
+        // cooldown van 500ms
+        if (now - lastTiltTime < 500) return;
+
+        if (Math.abs(beta) > tiltThreshold || Math.abs(gamma) > tiltThreshold) {
+            lastTiltTime = now;
+
+            debug.textContent = `TILT DETECTED! beta: ${beta}, gamma: ${gamma}`;
+
+            if (peer && peer.connected) {
+                peer.send(JSON.stringify({
+                    type: "tilt",
+                    emotion: "looking"
+                }));
+            }
+        }
+    });
+};
+```
+-> tilt detectie werkt nu ook!
+
+kleine opmerking: 
+- het is gevoelig -> treshold verhogen ??
+- weet soms niet of ik shake of tilt bedoel
+
+-> door de treshold te verhogen naar 30 is het minder gevoelig en weet het of ik shake of tilt
+
+```javascript
+const tiltDetection = () => {
+    const debug = document.getElementById("debug");
+    let lastTiltTime = 0;
+
+    window.addEventListener("deviceorientation", (event) => {
+        const beta = event.beta;
+        const gamma = event.gamma;
+
+        debug.textContent = `beta: ${beta}, gamma: ${gamma}`;
+
+        if (beta === null || gamma === null) return;
+
+        const tiltThreshold = 30;
+        const now = Date.now();
+
+        if (now - lastTiltTime < 500) return;
+
+        let direction = null;
+        if (Math.abs(beta) > tiltThreshold) {
+            direction = beta > 0 ? "forward" : "backward";
+        } else if (Math.abs(gamma) > tiltThreshold) {
+            direction = gamma > 0 ? "right" : "left";
+        }
+
+        if (direction) {
+            lastTiltTime = now;
+            debug.textContent = `TILT DETECTED! Direction: ${direction}`;
+
+            if (peer && peer.connected) {
+                peer.send(JSON.stringify({
+                    type: "tilt",
+                    emotion: "looking",
+                    direction: direction
+                }));
+            }
+        }
+    });
+};
+```
+
+### naar welke kant tilt het?
+-> ik wil ook weten naar welke kant het tilt zodat ik dit kan gebruiken in de desktop animaties
