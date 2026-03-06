@@ -78,24 +78,24 @@ const setupShakeDetection = () => {
 };
 
 const swipeDetection = () => {
-    const hammer = new Hammer(document.body);
+    const swipeArea = document.getElementById('swipeArea');
+    const hammer = new Hammer(swipeArea);
 
     // Configure swipe recognizer
     hammer.get('swipe').set({
         direction: Hammer.DIRECTION_ALL,
-        threshold: 1,
+        threshold: 10,
         velocity: 0.3
     });
 
     hammer.on('swipe', (event) => {
-        console.log("Swipe detected!", event.direction);
-        if (peer && peer.connected) {
-            let direction = 'unknown';
-            if (event.direction === Hammer.DIRECTION_LEFT) direction = 'left';
-            if (event.direction === Hammer.DIRECTION_RIGHT) direction = 'right';
-            if (event.direction === Hammer.DIRECTION_UP) direction = 'up';
-            if (event.direction === Hammer.DIRECTION_DOWN) direction = 'down';
+        let direction = 'unknown';
+        if (event.direction === Hammer.DIRECTION_LEFT) direction = 'left';
+        if (event.direction === Hammer.DIRECTION_RIGHT) direction = 'right';
+        if (event.direction === Hammer.DIRECTION_UP) direction = 'up';
+        if (event.direction === Hammer.DIRECTION_DOWN) direction = 'down';
 
+        if (peer && peer.connected) {
             peer.send(JSON.stringify({
                 type: "swipe",
                 emotion: "laugh",

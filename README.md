@@ -716,3 +716,21 @@ Mogelijke oorzaken waarom het niet werkte:
 
 Test door op je telefoonscherm te swipen (niet schudden). Je zou nu "laugh detected" moeten zien op de desktop.
 
+### Nope nog altijd niets
+Ik heb de swipe detectie volledig vernieuwd met visuele feedback:
+
+Wijzigingen:
+- sender.html:7-35: Grote paarse SWIPE AREA toegevoegd met touch-action: none
+- sender.html:14-15: Feedback div die swipe richting toont
+- sender.js:80-142:
+- Swipe op specifieke swipe area (niet hele body)
+- Controleert of Hammer.js geladen is
+- Oranje feedback toont swipe richting
+- Rode melding als peer niet verbonden is
+- Console logs voor debugging
+
+Nu zie je:
+- Een grote paarse box met "← SWIPE HERE →"
+- Oranje melding "SWIPE LEFT/RIGHT/UP/DOWN DETECTED!" bij swipen
+- Rode melding als Hammer.js niet geladen is of peer niet verbonden
+- Herstart de server en swipe over de paarse box. Je zou direct visuele feedback moeten zien!

@@ -4,14 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/css/sender.css">
 
     <title>WebRTC</title>
 </head>
 
 <body>
-    <h1>Welcome</h1>
-    <p>Probeer de emotie van het karakter te veranderen door te schudden, te swipen of te tikken.</p>
-    <button id="testButton">Test Message</button>
+    <h1 class="title">Welcome</h1>
+    <p class="description">Probeer de emotie van het karakter te veranderen door te schudden, te swipen of te tikken.</p>
+    <button id="testButton">Klik</button>
+
+    <div id="swipeArea"></div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simplepeer.min.js"
