@@ -108,21 +108,69 @@ const swipeDetection = () => {
 
 // BOOS
 const tapDetection = () => {
-    const hammer = new Hammer(document.body);
+    const area = document.getElementById('area');
+    if (!area) {
+        console.error('Area element not found for tap detection');
+        return;
+    }
+
+    const hammer = new Hammer(area);
     hammer.on('tap', (event) => {
         console.log("Tap detected!");
         if (peer && peer.connected) {
             peer.send(JSON.stringify({ type: "tap", emotion: "laugh" }));
         }
     });
+
+    console.log('Tap detection initialized on area');
 };
 
+// DISGUST
+const pinchDetection = () => {
+    const area = document.getElementById('area');
+    const hammer = new Hammer(area);
+
+    // Enable pinch recognizer (not enabled by default!)
+    hammer.get('pinch').set({ enable: true });
+
+    let lastPinchTime = 0;
+
+    hammer.on('pinch', (event) => {
+        // Throttle to prevent multiple sends
+        const now = Date.now();
+        if (now - lastPinchTime < 500) return;
+        lastPinchTime = now;
+
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({
+                type: "pinch",
+                emotion: "disgust",
+                scale: event.scale
+            }));
+        } else {
+            console.warn('Pinch detected but not connected');
+        }
+    });
+};
+
+// TITL
+const TiltDetection = () => {
+    const hammer = new Hammer(document.body);
+    hammer.on('rotate', (event) => {
+        console.log("Tilt detected!");
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({ type: "tilt", emotion: "looking" }));
+        }
+    });
+};
 
 const init = () => {
     TestButton();
     setupShakeDetection();
     swipeDetection();
     tapDetection();
+    pinchDetection();
+    TiltDetection();
 
     targetSocketId = getUrlParameter('id');
     if (!targetSocketId) {

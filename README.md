@@ -24,8 +24,8 @@
 - schudden detectie maken -> desktop reageert met "fear detected" -> PROBLEEM
 - swipen detectie maken -> desktop reageert met "laugh detected" OK
 - tikken detectie maken -> desktop reageert met "anger detected" OK
-- pinch detectie maken -> desktop reageert met "disgust detected" 
-- tilt detectie maken -> desktop reageert met "looking left/right"
+- pinch detectie maken -> desktop reageert met "disgust detected" OK
+- tilt detectie maken -> desktop reageert met "looking left/right" 
 ### Week 5
 - karakter en emoties animeren 
 - gezichtsuitdrukking van het karakter aanpassen aan de emoties
@@ -789,7 +789,6 @@ const tapDetection = () => {
     });
 };
 ```
--> voorbeeld van hammerjs gevolgd om dit te bekomen
 
 #### index2.js
 ``` javascript
@@ -801,8 +800,103 @@ if (message.type === 'tap') {
   }
 }
 ```
-
+-> voorbeeld van laugh gevolgd om dit te bekomen
 -> HET WERKT
 - tikken op het scherm zorgt ervoor dat er "anger detected" verschijnt op de desktop
 
 ## Pinch detectie -> disgust
+#### sender.js
+```javascript
+const pinchDetection = () => {
+    const hammer = new Hammer(document.body);
+    hammer.on('pinch', (event) => {
+        console.log("Pinch detected!");
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({ type: "pinch", emotion: "disgust" }));
+        }
+    });
+};
+```
+#### index2.js
+``` javascript
+if (message.type === 'pinch') {
+  console.log('Pinch detected via WebRTC!');
+  if ($emoties) {
+    $emoties.textContent = 'disgust detected';
+    $emoties.style.display = 'block';
+  }
+}
+```
+
+### Werkt niet
+Ik heb pinch detectie gerepareerd - het probleem was dat pinch niet standaard geactiveerd is in Hammer.js:
+
+Wijzigingen:
+sender.js:129-178:
+
+- hammer.get('pinch').set({ enable: true }) toegevoegd (ESSENTIEEL!)
+- Visuele feedback: oranje achtergrond en scaling bij pinchen
+- Gele rand bij pinch start/end
+- Throttling om dubbele berichten te voorkomen
+- Werkt nu op dezelfde #area als tap en swipe
+- sender.html:16-20: Tekst toegevoegd "Use 2 fingers to pinch" als hint
+- sender.js:109-126: Tap detectie ook naar #area verplaatst voor consistentie
+
+### NU werkt het wel
+- fout was vooral de hammer.get op enabled zetten
+- alle onnodige code terug verwijderd
+
+```javascript
+const pinchDetection = () => {
+    const area = document.getElementById('area');
+    const hammer = new Hammer(area);
+
+    // Enable pinch recognizer (not enabled by default!)
+    hammer.get('pinch').set({ enable: true });
+
+    let lastPinchTime = 0;
+
+    hammer.on('pinch', (event) => {
+        // Throttle to prevent multiple sends
+        const now = Date.now();
+        if (now - lastPinchTime < 500) return;
+        lastPinchTime = now;
+
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({
+                type: "pinch",
+                emotion: "disgust",
+                scale: event.scale
+            }));
+        } else {
+            console.warn('Pinch detected but not connected');
+        }
+    });
+};
+```
+
+## Tilt detectie -> andere kant kijken
+#### sender.js
+```javascript
+const TiltDetection = () => {
+    const hammer = new Hammer(document.body);
+    hammer.on('rotate', (event) => {
+        console.log("Tilt detected!");
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({ type: "tilt", emotion: "looking" }));
+        }
+    });
+};
+```
+#### index2.js
+``` javascript
+if (message.type === 'tilt') {
+  console.log('Tilt detected via WebRTC!');
+  if ($emoties) {
+    $emoties.textContent = 'looking detected';
+    $emoties.style.display = 'block';
+  }
+}
+```
+
+### 

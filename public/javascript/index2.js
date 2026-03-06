@@ -90,6 +90,13 @@ const connectPeer = (peerId) => {
                 $emoties.style.display = 'block';
             }
         }
+        if (message.type === 'pinch') {
+            console.log('Pinch detected via WebRTC!');
+            if ($emoties) {
+                $emoties.textContent = 'disgust detected';
+                $emoties.style.display = 'block';
+            }
+        }
     });
 
     return peer;
