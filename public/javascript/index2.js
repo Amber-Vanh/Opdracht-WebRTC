@@ -98,9 +98,9 @@ const connectPeer = (peerId) => {
             }
         }
         if (message.type === 'tilt') {
-            console.log('Tilt detected via WebRTC!');
+            console.log('Tilt detected via WebRTC!', message.direction);
             if ($emoties) {
-                $emoties.textContent = 'looking detected';
+                $emoties.textContent = 'looking detected (' + message.direction + ')';
                 $emoties.style.display = 'block';
             }
         }

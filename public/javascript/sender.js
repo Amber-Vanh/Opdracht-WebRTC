@@ -93,7 +93,6 @@ const swipeDetection = () => {
     const area = document.getElementById('area');
     const hammer = new Hammer(area);
 
-    // Configure swipe recognizer
     hammer.get('swipe').set({
         direction: Hammer.DIRECTION_ALL,
         threshold: 10,
@@ -101,17 +100,10 @@ const swipeDetection = () => {
     });
 
     hammer.on('swipe', (event) => {
-        let direction = 'unknown';
-        if (event.direction === Hammer.DIRECTION_LEFT) direction = 'left';
-        if (event.direction === Hammer.DIRECTION_RIGHT) direction = 'right';
-        if (event.direction === Hammer.DIRECTION_UP) direction = 'up';
-        if (event.direction === Hammer.DIRECTION_DOWN) direction = 'down';
-
         if (peer && peer.connected) {
             peer.send(JSON.stringify({
                 type: "swipe",
-                emotion: "laugh",
-                direction: direction
+                emotion: "laugh"
             }));
         }
     });
@@ -169,30 +161,40 @@ const tiltDetection = () => {
     let lastTiltTime = 0;
 
     window.addEventListener("deviceorientation", (event) => {
-        const beta = event.beta;
-        const gamma = event.gamma;
+        const beta = event.beta;   // voor/achter
+        const gamma = event.gamma; // links/rechts
 
         if (beta === null || gamma === null) return;
 
         const tiltThreshold = 30;
         const now = Date.now();
 
-        // cooldown van 500ms = niet constant detecteren
+        // cooldown
         if (now - lastTiltTime < 500) return;
 
-        if (Math.abs(beta) > tiltThreshold || Math.abs(gamma) > tiltThreshold) {
+        let direction = null;
+
+        // Links / rechts
+        if (gamma < -tiltThreshold) direction = "left";
+        else if (gamma > tiltThreshold) direction = "right";
+
+        // Boven / onder
+        else if (beta < -tiltThreshold) direction = "up";
+        else if (beta > tiltThreshold) direction = "down";
+
+        if (direction) {
             lastTiltTime = now;
 
             if (peer && peer.connected) {
                 peer.send(JSON.stringify({
                     type: "tilt",
-                    emotion: "looking"
+                    emotion: "looking",
+                    direction: direction
                 }));
             }
         }
     });
 };
-
 
 const init = () => {
     TestButton();

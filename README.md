@@ -25,7 +25,7 @@
 - swipen detectie maken -> desktop reageert met "laugh detected" OK
 - tikken detectie maken -> desktop reageert met "anger detected" OK
 - pinch detectie maken -> desktop reageert met "disgust detected" OK
-- tilt detectie maken -> desktop reageert met "looking left/right" 
+- tilt detectie maken -> desktop reageert met "looking left/right" OK
 ### Week 5
 - karakter en emoties animeren 
 - gezichtsuitdrukking van het karakter aanpassen aan de emoties
@@ -1065,3 +1065,93 @@ const tiltDetection = () => {
 
 ### naar welke kant tilt het?
 -> ik wil ook weten naar welke kant het tilt zodat ik dit kan gebruiken in de desktop animaties
+-> zou dit ongeveer werken zoals swipe detectie dat ik richtingen meegaf?
+-> werkt dus met de gamma en beta waarden
+
+- links = gamma < 0
+- rechts = gamma > 0
+- boven = beta < 0
+- onder = beta > 0
+
+#### sender.js
+```javascript
+const tiltDetection = () => {
+    let lastTiltTime = 0;
+
+    window.addEventListener("deviceorientation", (event) => {
+        const beta = event.beta;   // voor/achter
+        const gamma = event.gamma; // links/rechts
+
+        if (beta === null || gamma === null) return;
+
+        const tiltThreshold = 30;
+        const now = Date.now();
+
+        // cooldown
+        if (now - lastTiltTime < 500) return;
+
+        let direction = null;
+
+        // Links / rechts
+        if (gamma < -tiltThreshold) direction = "left";
+        else if (gamma > tiltThreshold) direction = "right";
+
+        // Boven / onder
+        else if (beta < -tiltThreshold) direction = "up";
+        else if (beta > tiltThreshold) direction = "down";
+
+        if (direction) {
+            lastTiltTime = now;
+
+            if (peer && peer.connected) {
+                peer.send(JSON.stringify({
+                    type: "tilt",
+                    emotion: "looking",
+                    direction: direction
+                }));
+            }
+        }
+    });
+};
+```
+#### index2.js
+```javascript
+if (message.type === 'tilt') {
+  console.log('Tilt detected via WebRTC!', message.direction);
+  if ($emoties) {
+    $emoties.textContent = 'looking detected (' + message.direction + ')';
+    $emoties.style.display = 'block';
+  }
+}
+```
+
+## Aanpassingen swipe
+-> eigenlijk moet ik daar niet weten in welke richting geswiped wordt
+```javascript
+const swipeDetection = () => {
+    const area = document.getElementById('area');
+    const hammer = new Hammer(area);
+
+    hammer.get('swipe').set({
+        direction: Hammer.DIRECTION_ALL,
+        threshold: 10,
+        velocity: 0.3
+    });
+
+    hammer.on('swipe', (event) => {
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({
+                type: "swipe",
+                emotion: "laugh"
+            }));
+        }
+    });
+};
+```
+
+-> versimpeling van de code aangezien ik de richting toch niet gebruik in de desktop animaties
+
+## Reflectie op AI gebruik
+- eenmaal de eerste emotie werkte ging het vlot en gebruikte ik AI enkel voor foutmeldingen of wanneer het niet werkte in ik niet zag hoe ik het kon oplossen
+- ik snap wat er is gebeurd maar ik weet niet of ik dit zelf had kunnen bedenken
+
