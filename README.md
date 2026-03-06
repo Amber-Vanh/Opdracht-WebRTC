@@ -22,9 +22,9 @@
 - javascript library zoeken (hammer.js) voor touch events OK
 - checken of iets wel wordt doorgestuurd OK
 - schudden detectie maken -> desktop reageert met "fear detected" -> PROBLEEM
-- swipen detectie maken -> desktop reageert met "laugh detected" 
-- tikken detectie maken -> desktop reageert met "anger detected"
-- pinch detectie maken -> desktop reageert met "disgust detected"
+- swipen detectie maken -> desktop reageert met "laugh detected" OK
+- tikken detectie maken -> desktop reageert met "anger detected" OK
+- pinch detectie maken -> desktop reageert met "disgust detected" 
 - tilt detectie maken -> desktop reageert met "looking left/right"
 ### Week 5
 - karakter en emoties animeren 
@@ -734,3 +734,75 @@ Nu zie je:
 - Oranje melding "SWIPE LEFT/RIGHT/UP/DOWN DETECTED!" bij swipen
 - Rode melding als Hammer.js niet geladen is of peer niet verbonden
 - Herstart de server en swipe over de paarse box. Je zou direct visuele feedback moeten zien!
+
+### Reflectie
+- ik zag het probleem met de swipe detectie echt niet
+- ik snap wat AI allemaal heeft uitgevoerd maar weet vaak niet hoe ik dit zelf had kunnen bedenken of schrijven
+- ik heb achterna alle overbodige code handmatig weggedaan en het werkte nog altijd dus ik weet dat ik snap wat er is gebeurd
+
+### HET WERKT
+- swipe area zorgde ervoor dat het werkte
+- alle overbodige code terug weg gedaan
+- werkt nog altijd
+
+#### sender.js
+```javascript
+const swipeDetection = () => {
+    const area = document.getElementById('area');
+    const hammer = new Hammer(area);
+
+    // Configure swipe recognizer
+    hammer.get('swipe').set({
+        direction: Hammer.DIRECTION_ALL,
+        threshold: 10,
+        velocity: 0.3
+    });
+
+    hammer.on('swipe', (event) => {
+        let direction = 'unknown';
+        if (event.direction === Hammer.DIRECTION_LEFT) direction = 'left';
+        if (event.direction === Hammer.DIRECTION_RIGHT) direction = 'right';
+        if (event.direction === Hammer.DIRECTION_UP) direction = 'up';
+        if (event.direction === Hammer.DIRECTION_DOWN) direction = 'down';
+
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({
+                type: "swipe",
+                emotion: "laugh",
+                direction: direction
+            }));
+        }
+    });
+};
+```
+
+## Tik detectie -> boos
+#### sender.js
+```javascript
+const tapDetection = () => {
+    const hammer = new Hammer(document.body);
+    hammer.on('tap', (event) => {
+        console.log("Tap detected!");
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({ type: "tap", emotion: "laugh" }));
+        }
+    });
+};
+```
+-> voorbeeld van hammerjs gevolgd om dit te bekomen
+
+#### index2.js
+``` javascript
+if (message.type === 'tap') {
+  console.log('Tap detected via WebRTC!');
+  if ($emoties) {
+    $emoties.textContent = 'anger detected';
+    $emoties.style.display = 'block';
+  }
+}
+```
+
+-> HET WERKT
+- tikken op het scherm zorgt ervoor dat er "anger detected" verschijnt op de desktop
+
+## Pinch detectie -> disgust

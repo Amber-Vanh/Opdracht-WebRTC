@@ -64,6 +64,10 @@ const connectPeer = (peerId) => {
         const message = JSON.parse(data.toString());
         if (message.type === 'button') {
             console.log(`Button ${message.value} pressed via WebRTC!`);
+            if ($emoties) {
+                $emoties.textContent = 'button clicked';
+                $emoties.style.display = 'block';
+            }
         }
         if (message.type === 'shake') {
             console.log('Shake detected via WebRTC!');
@@ -76,6 +80,13 @@ const connectPeer = (peerId) => {
             console.log('Swipe detected via WebRTC!');
             if ($emoties) {
                 $emoties.textContent = 'laugh detected';
+                $emoties.style.display = 'block';
+            }
+        }
+        if (message.type === 'tap') {
+            console.log('Tap detected via WebRTC!');
+            if ($emoties) {
+                $emoties.textContent = 'anger detected';
                 $emoties.style.display = 'block';
             }
         }

@@ -77,9 +77,10 @@ const setupShakeDetection = () => {
     });
 };
 
+// LACHEN
 const swipeDetection = () => {
-    const swipeArea = document.getElementById('swipeArea');
-    const hammer = new Hammer(swipeArea);
+    const area = document.getElementById('area');
+    const hammer = new Hammer(area);
 
     // Configure swipe recognizer
     hammer.get('swipe').set({
@@ -105,11 +106,23 @@ const swipeDetection = () => {
     });
 };
 
+// BOOS
+const tapDetection = () => {
+    const hammer = new Hammer(document.body);
+    hammer.on('tap', (event) => {
+        console.log("Tap detected!");
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({ type: "tap", emotion: "laugh" }));
+        }
+    });
+};
+
 
 const init = () => {
     TestButton();
     setupShakeDetection();
     swipeDetection();
+    tapDetection();
 
     targetSocketId = getUrlParameter('id');
     if (!targetSocketId) {

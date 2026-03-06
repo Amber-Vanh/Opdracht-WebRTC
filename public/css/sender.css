@@ -25,10 +25,10 @@ button {
 .description {
     margin: 0rem auto;
     margin-bottom: 1rem;
-    max-width: 60%;
+    max-width: 90%;
 }
 
-#swipeArea {
+#area {
     width: 100%;
     height: 300px;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
