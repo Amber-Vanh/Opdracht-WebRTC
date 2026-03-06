@@ -1,4 +1,13 @@
+:root {
+    --color-purple: #6b4dd1;
+    --color-Lpurple: #e1c3ff;
+    --color-Dpurple: #362061;
+    --color-yellow: #f4cf43;
+    --color-beige: #fff9f1;
+}
+
 body {
+    background-color: var(--color-beige);
     margin: 0;
     padding: 10px;
     font-family: Arial, sans-serif;
@@ -10,15 +19,17 @@ button {
     font-size: 16px;
     margin-bottom: 20px;
     cursor: pointer;
-    background-color: #f2f545;
-    border: #b6b841 2px solid;
-    color: black;
+    background-color: var(--color-purple);
+    border: var(--color-Dpurple) 2px solid;
+    border-radius: 8px;
+    color: var(--color-Lpurple);
 
     display: flex;
     justify-self: center;
 }
 
-.title, .description {
+.title,
+.description {
     text-align: center;
 }
 
@@ -31,7 +42,8 @@ button {
 #area {
     width: 100%;
     height: 300px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /*background: linear-gradient(135deg, #362061 0%, #e1c3ff 100%);*/
+    background-color: var(--color-Lpurple);
     border-radius: 10px;
     margin: 20px 0;
     display: flex;
