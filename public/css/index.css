@@ -10,6 +10,7 @@ body {
     background-color: var(--color-beige);
 }
 
+/*
 .emoties {
     width: max-content;
     height: max-content;
@@ -21,7 +22,7 @@ body {
     justify-self: center;
     font-size: 40px;
 }
-
+*/
 /*
 .url {
     display: none;
@@ -42,5 +43,23 @@ body {
 }
 
 .qr {
+    display: block;
     margin: 2rem;
+}
+
+#fear,
+#disgust,
+#anger,
+#laugh,
+#looking {
+    display: none;
+    
+    max-width: 25rem;
+    height: auto;
+
+    align-self: center;
+    justify-self: center;
+
+    background-color: #e1c3ff;
+    border-radius: 8px;
 }

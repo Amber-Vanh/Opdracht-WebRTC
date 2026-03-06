@@ -28,6 +28,7 @@
 - tilt detectie maken -> desktop reageert met "looking left/right" OK
 - css aangepast OK
 - gsm ui verbeteren -> duidelijke instructies, minimalistisch design -> css OK
+- images toevoegen bij het detecteren van emoties -> PROBLEEM
 ### TEGEN 19/03
 - karakter en emoties animeren 
 - gezichtsuitdrukking van het karakter aanpassen aan de emoties
@@ -1157,25 +1158,33 @@ const swipeDetection = () => {
 
 ## Emotie images toevoegen (later omzetten naar animaties)
 #### index.html
-```html<div id="emotions">
-  <img id="fear" src="/images/fear.png" style="display:none;">
-  <img id="laugh" src="/images/laugh.png" style="display:none;">
-  <img id="anger" src="/images/anger.png" style="display:none;">
-  <img id="disgust" src="/images/disgust.png" style="display:none;">
-  <img id="looking" src="/images/looking.png" style="display:none;">
-</div>
+```html
+    <div class="emoties" id="emotions">
+        <img id="fear" src="/assets/fear.png">
+        <img id="laugh" src="/assets/laugh.png">
+        <img id="anger" src="/assets/anger.png">
+        <img id="disgust" src="/assets/disgust.png">
+        <img id="looking" src="/assets/looking.png">
+    </div>
 ```
+-> display none in css zodat ze niet zichtbaar zijn tot er een emotie gedetecteerd wordt
+
 #### index2.js
-```javascriptif (message.type === 'shake') {
-  console.log('Shake detected via WebRTC!');
-  if ($emoties) {
-    $emoties.textContent = '';
-    document.getElementById('fear').style.display = 'block';
-    setTimeout(() => {
-      document.getElementById('fear').style.display = 'none';
-    }, 2000);
-  }
+```javascript
+if (message.type === 'shake') {
+    console.log('Shake detected via WebRTC!');
+    if ($emoties) {
+        $emoties.textContent = 'fear detected';
+        document.getElementById('fear').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('fear').style.display = 'none';
+        }, 2000);
+    }
 }
 ```
 -> voorbeeld van shake gevolgd om dit te bekomen
 -> ik heb dit gedaan voor alle emoties zodat er een afbeelding verschijnt bij elke emotie
+ 
+KLIEN PROBLEEM
+- in de console log wordt nog gedetecteer welke emotie er is
+- geen image wordt getoond bij het detecteren van een emotie
