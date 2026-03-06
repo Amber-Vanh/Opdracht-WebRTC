@@ -21,7 +21,7 @@
 - index.html en receiver.html samenvoegen OK
 - javascript library zoeken (hammer.js) voor touch events OK
 - checken of iets wel wordt doorgestuurd OK
-- schudden detectie maken -> desktop reageert met "fear detected" -> PROBLEEM
+- schudden detectie maken -> desktop reageert met "fear detected" -> PROBLEEM -> opgelost OK
 - swipen detectie maken -> desktop reageert met "laugh detected" OK
 - tikken detectie maken -> desktop reageert met "anger detected" OK
 - pinch detectie maken -> desktop reageert met "disgust detected" OK
@@ -926,4 +926,45 @@ Test het:
 - website moet op https draaien om dit te kunnen oplossen
 
 ## https gebruiken
+-> terminal:
+```
+openssl req -x509 -out localhost.crt -keyout localhost.key \
+  -newkey rsa:2048 -nodes -sha256 \
+  -subj '/CN=localhost' -extensions EXT -config <( \
+   printf "[dn]\nCN=localhost\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
+```
 
+-> Update the server initialization code to use the SSL certificate:
+```javascript
+const fs = require('fs');
+const options = {
+  key: fs.readFileSync('./localhost.key'),
+  cert: fs.readFileSync('./localhost.cert')
+};
+const server = require('https').Server(options, app); // httpS instead of http
+```
+
+### Foutmelding
+```
+Error: ENOENT: no such file or directory, open '/localhost.key'
+    at Object.openSync (node:fs:561:18)
+    at Object.readFileSync (node:fs:445:35)
+    at Object.<anonymous> (/Users/ambervanhooren/Desktop/CC4/Opdracht - webRTC/index.js:7:11)
+    at Module._compile (node:internal/modules/cjs/loader:1706:14)
+    at Object..js (node:internal/modules/cjs/loader:1839:10)
+    at Module.load (node:internal/modules/cjs/loader:1441:32)
+    at Function._load (node:internal/modules/cjs/loader:1263:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:322:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:237:24)
+    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:171:5) {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'open',
+  path: '/localhost.key'
+}
+```
+
+-> oplossing
+- de foutmelding kwam door een typfout in het pad van de naam van het certificaat
+
+### Shake werkt al, tilt nog niet
