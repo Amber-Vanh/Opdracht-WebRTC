@@ -46,7 +46,7 @@ const TestButton = () => {
 };
 
 // BANG
-const setupShakeDetection = () => {
+const shakeDetection = () => {
     let lastX = null;
     let lastY = null;
     let lastZ = null;
@@ -186,7 +186,7 @@ const tiltDetection = () => {
 
 const init = () => {
     TestButton();
-    setupShakeDetection();
+    shakeDetection();
     swipeDetection();
     tapDetection();
     pinchDetection();

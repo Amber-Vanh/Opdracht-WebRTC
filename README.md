@@ -6,17 +6,17 @@
 - [Code](#code)
 
 # Planning
-### Week 2
+### TEGEN 26/02 -> OK
 - Briefing herlezen OK
 - Github aanmaken + indienen OK
 - concepten uitwerken OK
 - qr-code communicatie tussen desktop en gsm OK
-### Week 3
+### TEGEN 05/03 -> OK
 - planning rest van het project OK
 - concept uitwerken OK
 - core feautures bepalen + onderzoeken OK
 - webrtc communicatie maken OK
-### Week 4
+### TEGEN 12/03 -> OK
 - html - css - javascript scheiden OK
 - index.html en receiver.html samenvoegen OK
 - javascript library zoeken (hammer.js) voor touch events OK
@@ -26,15 +26,15 @@
 - tikken detectie maken -> desktop reageert met "anger detected" OK
 - pinch detectie maken -> desktop reageert met "disgust detected" OK
 - tilt detectie maken -> desktop reageert met "looking left/right" OK
-### Week 5
+- css aangepast OK
+- gsm ui verbeteren -> duidelijke instructies, minimalistisch design -> css OK
+### TEGEN 19/03
 - karakter en emoties animeren 
 - gezichtsuitdrukking van het karakter aanpassen aan de emoties
 - overgangen tussen de emoties maken
-### Week 6
-- gsm ui verbeteren -> duidelijke instructies, minimalistisch design -> css
 - extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop)
+### TEGEN 22/03 = DEADLINE
 - laatste problemen oplossen, testen, finetunen
-- indienen -> deadline 22 maart.
 
 # Briefing
 ### Minimaal
@@ -1155,3 +1155,27 @@ const swipeDetection = () => {
 - eenmaal de eerste emotie werkte ging het vlot en gebruikte ik AI enkel voor foutmeldingen of wanneer het niet werkte in ik niet zag hoe ik het kon oplossen
 - ik snap wat er is gebeurd maar ik weet niet of ik dit zelf had kunnen bedenken
 
+## Emotie images toevoegen (later omzetten naar animaties)
+#### index.html
+```html<div id="emotions">
+  <img id="fear" src="/images/fear.png" style="display:none;">
+  <img id="laugh" src="/images/laugh.png" style="display:none;">
+  <img id="anger" src="/images/anger.png" style="display:none;">
+  <img id="disgust" src="/images/disgust.png" style="display:none;">
+  <img id="looking" src="/images/looking.png" style="display:none;">
+</div>
+```
+#### index2.js
+```javascriptif (message.type === 'shake') {
+  console.log('Shake detected via WebRTC!');
+  if ($emoties) {
+    $emoties.textContent = '';
+    document.getElementById('fear').style.display = 'block';
+    setTimeout(() => {
+      document.getElementById('fear').style.display = 'none';
+    }, 2000);
+  }
+}
+```
+-> voorbeeld van shake gevolgd om dit te bekomen
+-> ik heb dit gedaan voor alle emoties zodat er een afbeelding verschijnt bij elke emotie
