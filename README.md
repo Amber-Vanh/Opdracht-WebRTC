@@ -5,6 +5,10 @@
 - [Feedback](#feedback)
 - [Code](#code)
 
+
+# REMINDER AAN MEZELF
+- thuis werken met hotspot en 4G, niet met wifi want dat blokkeert de WebRTC verbinding door beveiliging op wifi
+
 # Planning
 ### TEGEN 26/02 -> OK
 - Briefing herlezen OK
@@ -30,13 +34,18 @@
 - gsm ui verbeteren -> duidelijke instructies, minimalistisch design -> css OK
 - images toevoegen bij het detecteren van emoties -> PROBLEEM
 ### TEGEN 19/03
+- code consistentie -> camelCase functies + soort functie hetzelfde houden
+- script in html aanpassen naar script type module
+- js -> init zonder domcontent maar gwn init()
 - probleem met images oplossen
 - karakter en emoties animeren 
-- gezichtsuitdrukking van het karakter aanpassen aan de emoties
 - overgangen tussen de emoties maken
 - extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop)
 ### TEGEN 22/03 = DEADLINE
+- code simplifieren -> geen shake doorsturen wel de emotie, 1 if block voor alle emoties (index2.js)
 - laatste problemen oplossen, testen, finetunen
+- zorg voor consistentie in code (camelCase, functie-soort)
+
 
 # Briefing
 ### Minimaal
@@ -326,6 +335,8 @@ WebRTC
 - javascript library gebruiken voor de touch events (hammer.js) -> maakt het makkelijker en betrouwbaarder
 - planning week 4 gedetailleerder maken -> per feature
 
+## 12/03
+- 
 
 # Code
 ## foutmelding qr-code
