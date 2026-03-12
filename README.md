@@ -30,6 +30,7 @@
 - gsm ui verbeteren -> duidelijke instructies, minimalistisch design -> css OK
 - images toevoegen bij het detecteren van emoties -> PROBLEEM
 ### TEGEN 19/03
+- probleem met images oplossen
 - karakter en emoties animeren 
 - gezichtsuitdrukking van het karakter aanpassen aan de emoties
 - overgangen tussen de emoties maken
