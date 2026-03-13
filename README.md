@@ -33,7 +33,7 @@
 - css aangepast OK
 - gsm ui verbeteren -> duidelijke instructies, minimalistisch design -> css OK
 - images toevoegen bij het detecteren van emoties -> PROBLEEM
-### TEGEN 19/03
+### TEGEN 19/03 -> OK
 - code consistentie -> camelCase functies + soort functie hetzelfde houden OK
 - script in html aanpassen naar script type module OK
 - js -> init zonder domcontent maar gwn init() OK
@@ -45,7 +45,6 @@
 ### TEGEN 22/03 = DEADLINE
 - code simplifieren -> geen shake doorsturen wel de emotie, 1 if block voor alle emoties (index2.js)
 - zorg voor consistentie in code (camelCase, functie-soort) OK
-
 
 # Briefing
 ### Minimaal
