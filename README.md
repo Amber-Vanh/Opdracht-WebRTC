@@ -37,10 +37,10 @@
 - code consistentie -> camelCase functies + soort functie hetzelfde houden OK
 - script in html aanpassen naar script type module OK
 - js -> init zonder domcontent maar gwn init() OK
-- probleem met images oplossen 
+- probleem met images oplossen OK
 - karakter en emoties animeren 
-- overgangen tussen de emoties maken
-- extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop)
+- overgangen tussen de emoties maken 
+- extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop) 
 ### TEGEN 22/03 = DEADLINE
 - code simplifieren -> geen shake doorsturen wel de emotie, 1 if block voor alle emoties (index2.js)
 - laatste problemen oplossen, testen, finetunen
@@ -1200,3 +1200,23 @@ if (message.type === 'shake') {
 KLIEN PROBLEEM
 - in de console log wordt nog gedetecteer welke emotie er is
 - geen image wordt getoond bij het detecteren van een emotie
+
+### Probleem Images oplossen
+#### Tijdens consult
+- in de index.html stond een typfout, daar stond "emoticons" ipv "emotions"
+- foutmelding in console.log
+    ```
+    index2.js:96 Uncaught ReferenceError: $emotiesTekst is not defined
+    at p.<anonymous> (index2.js:96:17)
+    at r.emit (simplepeer.min.js:6:29537)
+    at c (simplepeer.min.js:6:43442)
+    at l (simplepeer.min.js:6:43301)
+    at s.push (simplepeer.min.js:6:47421)
+    at p._onChannelMessage (simplepeer.min.js:6:95965)
+    at _channel.onmessage (simplepeer.min.js:6:88652)
+    ```
+
+- typfout in index2.js, daar stond bovenaan $emotiestekst terwijl bij de emoties $emotiesTekst stond
+
+-> nu worden wel de images en de tekst getoond bij het detecteren van een emotie
+

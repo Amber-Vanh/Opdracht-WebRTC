@@ -2,7 +2,7 @@ let socket;
 const $url = document.getElementById('url');
 const $qr = document.getElementById('qr');
 const $emoties = document.getElementById('emoties');
-const $tekst = document.getElementById('emotiesTekst')
+const $emotiesTekst = document.getElementById('emotiesTekst')
 let currentPeer = null;
 
 // Initialize socket connection
@@ -66,7 +66,7 @@ const connectPeer = (peerId) => {
         if (message.type === 'button') {
             console.log(`Button ${message.value} pressed via WebRTC!`);
             if ($emoties) {
-                $emotiestekst.textContent = 'button clicked';
+                $emotiesTekst.textContent = 'button clicked';
                 $emoties.style.display = 'block';
             }
         }
