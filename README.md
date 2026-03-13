@@ -1534,3 +1534,137 @@ const triggerSenderSound = (sound) => {
         }
 ```
 
+## Opruimen van code 
+- testbutton verwijderen
+- defaultAudio verwijderen
+- emotiesTekst verwijderen
+- console.logs verwijderen
+- onnodige comments verwijderen
+- index.html opschonen
+- index2.js opschonen
+- index.css opschonen
+- sender.html opschonen
+- sender.js opschonen
+- sender.css opschonen
+
+### code vragen die ik niet begrijp
+```javascript
+        if (selectedAudio !== $defaultAudio && $defaultAudio) {
+            $defaultAudio.currentTime = 0;
+            $defaultAudio.play().catch(fallbackErr => {
+                console.warn('Fallback audio failed:', fallbackErr);
+            });
+        }
+```
+- dit is een fallback, als het geluid dat bij de emotie hoort niet kan worden afgespeeld (omdat autoplay geblokkeerd is), probeer dan het default geluid af te spelen
+- default geluid is verwijderd dus dit stukje mag ook weg
+
+```javascript
+const clearDefaultTimer = () => {
+    if (resetToDefaultTimer) {
+        clearTimeout(resetToDefaultTimer);
+        resetToDefaultTimer = null;
+    }
+};
+```
+Concreet:
+- resetToDefaultTimer bewaart de setTimeout(...) die later de desktop terugzet naar de default-afbeelding.
+- if (resetToDefaultTimer) controleert of er al zo’n timer actief is.
+- clearTimeout(resetToDefaultTimer) stopt die timer.
+- resetToDefaultTimer = null markeert daarna dat er geen actieve timer meer is.
+
+Waarom is dat nodig?
+- Stel: je detecteert eerst shake, en 1 seconde later swipe.
+- Dan zou de oude timer van shake na 2 seconden nog steeds kunnen afgaan en je animatie te vroeg terugzetten naar default.
+- Door eerst de oude timer te wissen, blijft alleen de nieuwste timer actief.
+
+Kort: 
+- dit voorkomt dat oude timeouts je huidige animatie onderbreken.
+
+```javascript
+const triggerSenderSound = (sound) => {
+    if (!currentPeer || !currentPeer.connected) {
+        return;
+    }
+
+    currentPeer.send(JSON.stringify({
+        type: 'playSound',
+        sound
+    }));
+};
+```
+- desktop detecteert emotie
+- desktop roept triggerSenderSound aan
+- sender ontvangt playSound
+- sender speelt juiste geluid af
+
+
+```javascript
+const showDefaultState = () => {
+    clearDefaultTimer();
+
+    if (currentAnimation) {
+        currentAnimation.destroy();
+        currentAnimation = null;
+    }
+
+    if ($emotionAnimation) {
+        $emotionAnimation.style.display = 'none';
+        $emotionAnimation.innerHTML = '';
+    }
+
+    if ($defaultImage) {
+        $defaultImage.style.display = 'flex';
+    }
+};
+```
+- stop huidige animatie
+- maak animatiecontainer leeg
+- toon opnieuw de standaardafbeelding
+
+```javascript
+const showEmotionAnimation = (assetPath, sound) => {
+    if (!$emoties || !$emotionAnimation || !$defaultImage) {
+        return;
+    }
+
+    clearDefaultTimer();
+
+    $defaultImage.style.display = 'none';
+    $emotionAnimation.style.display = 'block';
+    $emotionAnimation.innerHTML = '';
+
+    if (!window.lottie) {
+        showDefaultState();
+        return;
+    }
+
+    if (currentAnimation) {
+        currentAnimation.destroy();
+        currentAnimation = null;
+    }
+
+    currentAnimation = window.lottie.loadAnimation({
+        container: $emotionAnimation,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: assetPath
+    });
+
+    triggerSenderSound(sound);
+
+    resetToDefaultTimer = setTimeout(() => {
+        showDefaultState();
+    }, 2000);
+};
+```
+- verberg default
+- toon emotie
+- speel geluid
+- zet timer om na 2 seconden terug te gaan naar default
+
+### Reflectie op AI gebruik
+- voor het uitleggen van code is Ai handig, ik snap wel deels wat de code doet maar heb graag de bevestiging
+- voor het opschonen is het ook zeer handig, ik kijk soms over stukken code of besef niet dat het overbodig is
+

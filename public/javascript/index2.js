@@ -2,7 +2,6 @@ let socket;
 const $url = document.getElementById('url');
 const $qr = document.getElementById('qr');
 const $emoties = document.getElementById('emoties');
-const $emotiesTekst = document.getElementById('emotiesTekst');
 const $defaultImage = document.getElementById('defaultImage');
 const $emotionAnimation = document.getElementById('emotionAnimation');
 let currentPeer = null;
@@ -23,6 +22,7 @@ const directionAnimationMap = {
     right: './assets/rechts.json'
 };
 
+//voorkomt dat oude timeouts huidige animaties onderbreken
 const clearDefaultTimer = () => {
     if (resetToDefaultTimer) {
         clearTimeout(resetToDefaultTimer);
@@ -30,6 +30,7 @@ const clearDefaultTimer = () => {
     }
 };
 
+//afspelen van juiste geluid bij emotie
 const triggerSenderSound = (sound) => {
     if (!currentPeer || !currentPeer.connected) {
         return;
@@ -41,16 +42,13 @@ const triggerSenderSound = (sound) => {
     }));
 };
 
-const showDefaultState = (label = 'no emotion detected') => {
+//toont standaard image na animatie af te spelen
+const showDefaultState = () => {
     clearDefaultTimer();
 
     if (currentAnimation) {
         currentAnimation.destroy();
         currentAnimation = null;
-    }
-
-    if ($emotiesTekst) {
-        $emotiesTekst.textContent = label;
     }
 
     if ($emotionAnimation) {
@@ -61,27 +59,22 @@ const showDefaultState = (label = 'no emotion detected') => {
     if ($defaultImage) {
         $defaultImage.style.display = 'flex';
     }
-
-    triggerSenderSound('default');
 };
 
-const showEmotionAnimation = (assetPath, label, sound) => {
+// emotie + geluid afspelen
+const showEmotionAnimation = (assetPath, sound) => {
     if (!$emoties || !$emotionAnimation || !$defaultImage) {
         return;
     }
 
     clearDefaultTimer();
 
-    if ($emotiesTekst) {
-        $emotiesTekst.textContent = label;
-    }
-
     $defaultImage.style.display = 'none';
     $emotionAnimation.style.display = 'block';
     $emotionAnimation.innerHTML = '';
 
     if (!window.lottie) {
-        showDefaultState('no emotion detected');
+        showDefaultState();
         return;
     }
 
@@ -101,7 +94,7 @@ const showEmotionAnimation = (assetPath, label, sound) => {
     triggerSenderSound(sound);
 
     resetToDefaultTimer = setTimeout(() => {
-        showDefaultState('no emotion detected');
+        showDefaultState();
     }, 2000);
 };
 
@@ -130,6 +123,7 @@ const initSocket = () => {
     });
 };
 
+//qr generen
 const generateQRCode = (url) => {
     const typeNumber = 4;
     const errorCorrectionLevel = 'L';
@@ -167,28 +161,28 @@ const connectPeer = (peerId) => {
         if (message.type === 'shake') {
             console.log('Shake detected via WebRTC!');
             if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.shake, 'fear detected', 'fear');
+                showEmotionAnimation(emotionAnimationMap.shake, 'fear');
             }
         }
 
         if (message.type === 'swipe') {
             console.log('Swipe detected via WebRTC!');
             if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.swipe, 'laugh detected', 'laugh');
+                showEmotionAnimation(emotionAnimationMap.swipe, 'laugh');
             }
         }
 
         if (message.type === 'tap') {
             console.log('Tap detected via WebRTC!');
             if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.tap, 'anger detected', 'anger');
+                showEmotionAnimation(emotionAnimationMap.tap, 'anger');
             }
         }
 
         if (message.type === 'pinch') {
             console.log('Pinch detected via WebRTC!');
             if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.pinch, 'disgust detected', 'disgust');
+                showEmotionAnimation(emotionAnimationMap.pinch, 'disgust');
             }
         }
 
@@ -197,10 +191,9 @@ const connectPeer = (peerId) => {
             if ($emoties) {
                 const directionAsset = directionAnimationMap[message.direction];
                 if (directionAsset) {
-                    showEmotionAnimation(directionAsset, 'looking detected (' + message.direction + ')', 'looking');
-                    triggerSenderSound('looking');
+                    showEmotionAnimation(directionAsset, 'looking');
                 } else {
-                    showDefaultState('no emotion detected');
+                    showDefaultState();
                 }
             }
         }
