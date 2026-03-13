@@ -16,11 +16,8 @@
     <div class="qr" id="qr"></div>
     <div class="emoties" id="emoties">
         <div id="emotiesTekst"></div>
-        <img id="fear" src="./assets/Bang.png">
-        <img id="laugh" src="./assets/Lachen.png">
-        <img id="anger" src="./assets/Boos.png">
-        <img id="disgust" src="./assets/Disgust.png">
-        <img id="looking" src="./assets/Default.png">
+        <img id="defaultImage" src="./assets/Default.png" alt="Default emotie">
+        <div id="emotionAnimation" aria-live="polite"></div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -29,6 +26,8 @@
         crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simplepeer.min.js"
         integrity="sha512-0f7Ahsuvr+/P2btTY4mZIw9Vl23lS6LY/Y7amdkmUg2dqsUF+cTe4QjWvj/NIBHJoGksOiqndKQuI9yzn2hB0g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script type="module" src="/javascript/index2.js"></script>
 </body>

@@ -47,14 +47,10 @@ body {
     margin: 2rem;
 }
 
-#fear,
-#disgust,
-#anger,
-#laugh,
-#looking {
+#defaultImage,
+#emotionAnimation {
     display: none;
-    
-    
+
     max-width: 25rem;
     height: auto;
 
@@ -63,4 +59,9 @@ body {
 
     background-color: #e1c3ff;
     border-radius: 8px;
+}
+
+#emotionAnimation {
+    width: 25rem;
+    min-height: 25rem;
 }

@@ -2,8 +2,93 @@ let socket;
 const $url = document.getElementById('url');
 const $qr = document.getElementById('qr');
 const $emoties = document.getElementById('emoties');
-const $emotiesTekst = document.getElementById('emotiesTekst')
+const $emotiesTekst = document.getElementById('emotiesTekst');
+const $defaultImage = document.getElementById('defaultImage');
+const $emotionAnimation = document.getElementById('emotionAnimation');
 let currentPeer = null;
+let currentAnimation = null;
+let resetToDefaultTimer = null;
+
+const emotionAnimationMap = {
+    shake: './assets/angst.json',
+    swipe: './assets/blij.json',
+    tap: './assets/angry.json',
+    pinch: './assets/disgust.json'
+};
+
+const directionAnimationMap = {
+    up: './assets/boven.json',
+    down: './assets/onder.json',
+    left: './assets/links.json',
+    right: './assets/rechts.json'
+};
+
+const clearDefaultTimer = () => {
+    if (resetToDefaultTimer) {
+        clearTimeout(resetToDefaultTimer);
+        resetToDefaultTimer = null;
+    }
+};
+
+const showDefaultState = (label = 'no emotion detected') => {
+    clearDefaultTimer();
+
+    if (currentAnimation) {
+        currentAnimation.destroy();
+        currentAnimation = null;
+    }
+
+    if ($emotiesTekst) {
+        $emotiesTekst.textContent = label;
+    }
+
+    if ($emotionAnimation) {
+        $emotionAnimation.style.display = 'none';
+        $emotionAnimation.innerHTML = '';
+    }
+
+    if ($defaultImage) {
+        $defaultImage.style.display = 'flex';
+    }
+};
+
+const showEmotionAnimation = (assetPath, label) => {
+    if (!$emoties || !$emotionAnimation || !$defaultImage) {
+        return;
+    }
+
+    clearDefaultTimer();
+
+    if ($emotiesTekst) {
+        $emotiesTekst.textContent = label;
+    }
+
+    $defaultImage.style.display = 'none';
+    $emotionAnimation.style.display = 'block';
+    $emotionAnimation.innerHTML = '';
+
+    if (!window.lottie) {
+        showDefaultState('no emotion detected');
+        return;
+    }
+
+    if (currentAnimation) {
+        currentAnimation.destroy();
+        currentAnimation = null;
+    }
+
+    currentAnimation = window.lottie.loadAnimation({
+        container: $emotionAnimation,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: assetPath
+    });
+
+    resetToDefaultTimer = setTimeout(() => {
+        showDefaultState('no emotion detected');
+    }, 2000);
+};
 
 // Initialize socket connection
 const initSocket = () => {
@@ -63,62 +148,52 @@ const connectPeer = (peerId) => {
     peer.on('data', data => {
         console.log('Received data:', data.toString());
         const message = JSON.parse(data.toString());
+
         if (message.type === 'button') {
             console.log(`Button ${message.value} pressed via WebRTC!`);
             if ($emoties) {
-                $emotiesTekst.textContent = 'button clicked';
                 $emoties.style.display = 'block';
+                showDefaultState('no emotion detected');
             }
         }
+
         if (message.type === 'shake') {
             console.log('Shake detected via WebRTC!');
             if ($emoties) {
-                $emotiesTekst.textContent = 'fear detected';
-                document.getElementById('fear').style.display = 'flex';
-                setTimeout(() => {
-                    document.getElementById('fear').style.display = 'none';
-                }, 2000);
+                showEmotionAnimation(emotionAnimationMap.shake, 'fear detected');
             }
         }
+
         if (message.type === 'swipe') {
             console.log('Swipe detected via WebRTC!');
             if ($emoties) {
-                $emotiesTekst.textContent = 'laugh detected';
-                document.getElementById('laugh').style.display = 'flex';
-                setTimeout(() => {
-                    document.getElementById('laugh').style.display = 'none';
-                }, 2000);
+                showEmotionAnimation(emotionAnimationMap.swipe, 'laugh detected');
             }
         }
+
         if (message.type === 'tap') {
             console.log('Tap detected via WebRTC!');
             if ($emoties) {
-                $emotiesTekst.textContent = 'anger detected';
-                document.getElementById('anger').style.display = 'flex';
-                setTimeout(() => {
-                    document.getElementById('anger').style.display = 'none';
-                }, 2000);
+                showEmotionAnimation(emotionAnimationMap.tap, 'anger detected');
             }
         }
+
         if (message.type === 'pinch') {
             console.log('Pinch detected via WebRTC!');
             if ($emoties) {
-                $emotiesTekst.textContent = 'disgust detected';
-                document.getElementById('disgust').style.display = 'flex';
-                setTimeout(() => {
-                    document.getElementById('disgust').style.display = 'none';
-                }, 2000);
+                showEmotionAnimation(emotionAnimationMap.pinch, 'disgust detected');
             }
         }
+
         if (message.type === 'tilt') {
             console.log('Tilt detected via WebRTC!', message.direction);
-            //hoe kan ik hier een image per direction kiezen ???
             if ($emoties) {
-                $emotiesTekst.textContent = 'looking detected (' + message.direction + ')';
-                document.getElementById('looking').style.display = 'flex';
-                setTimeout(() => {
-                    document.getElementById('looking').style.display = 'none';
-                }, 2000);
+                const directionAsset = directionAnimationMap[message.direction];
+                if (directionAsset) {
+                    showEmotionAnimation(directionAsset, 'looking detected (' + message.direction + ')');
+                } else {
+                    showDefaultState('no emotion detected');
+                }
             }
         }
     });
@@ -129,6 +204,7 @@ const connectPeer = (peerId) => {
 // init
 const init = () => {
     initSocket();
+    showDefaultState();
 };
 
 init();

@@ -39,8 +39,8 @@
 - js -> init zonder domcontent maar gwn init() OK
 - probleem met images oplossen OK
 - karakter en emoties animeren OK
-- animaties tonen bij het detecteren van emoties + standaard gezicht tonen als er geen emotie is 
-- overgangen tussen de emoties maken 
+- animaties tonen bij het detecteren van emoties + standaard gezicht tonen als er geen emotie is OK
+- overgangen tussen de emoties maken OK
 - extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop) 
 ### TEGEN 22/03 = DEADLINE
 - code simplifieren -> geen shake doorsturen wel de emotie, 1 if block voor alle emoties (index2.js)
@@ -1221,3 +1221,197 @@ KLIEN PROBLEEM
 
 -> nu worden wel de images en de tekst getoond bij het detecteren van een emotie
 
+## Emotie animaties toevoegen
+- animatie per emotie
+- standaard emotie afbeelding wordt getoond als geen emotie gedetecteerd wordt
+
+### prompt
+```
+Zorg ervoor dat wanneer geen emotie gedecteerd wordt dat de image "default.png" getoond wordt, als een emotie gedetecteerd wordt moet de animatie passend bij de emotie getoond worden, deze staan als .json files in mijn assets.
+```
+
+### antwoord
+Aangepast: als er geen emotie is, wordt nu standaard de default-afbeelding getoond; bij detectie wordt de juiste JSON-animatie geladen.
+
+#### index.html:
+- Nieuwe default + animatiecontainer in de desktop-UI:index.html:17
+- Default afbeelding staat op index.html:19
+- Lottie script toegevoegd op index.html:30
+- Centrale weergavelogica toegevoegd:
+
+``` html
+<body>
+    <h1 class="titel">Desktop</h1>
+    <a class="url" id="url" href=""></a>
+    <div class="qr" id="qr"></div>
+    <div class="emoties" id="emoties">
+        <div id="emotiesTekst"></div>
+        <img id="defaultImage" src="./assets/Default.png" alt="Default emotie">
+        <div id="emotionAnimation" aria-live="polite"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"
+        integrity="sha512-ZDSPMa/JM1D+7kdg2x3BsruQ6T/JpJo3jWDWkCZsP+5yVyp1KfESqLI+7RqB5k24F7p2cV7i2YHh/890y6P6Sw=="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simplepeer.min.js"
+        integrity="sha512-0f7Ahsuvr+/P2btTY4mZIw9Vl23lS6LY/Y7amdkmUg2dqsUF+cTe4QjWvj/NIBHJoGksOiqndKQuI9yzn2hB0g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script type="module" src="/javascript/index2.js"></script>
+</body>
+```
+
+#### index2.js:
+- Mapping van events naar JSON assets op index2.js:12
+- Mapping van tilt-richtingen naar JSON assets op index2.js:19
+- Fallback naar default via showDefaultState op index2.js:33
+- Animatie tonen via showEmotionAnimation op index2.js:55
+- button event valt expliciet terug op default (geen emotie): index2.js:152
+- shake/swipe/tap/pinch tonen respectievelijke animaties: index2.js:160
+- tilt toont richting-animatie (boven/onder/links/rechts) of default bij onbekende richting: index2.js:188
+- Bij init wordt direct default getoond: index2.js:205
+
+```javascript
+const emotionAnimationMap = {
+    shake: './assets/angst.json',
+    swipe: './assets/blij.json',
+    tap: './assets/angry.json',
+    pinch: './assets/disgust.json'
+};
+
+const directionAnimationMap = {
+    up: './assets/boven.json',
+    down: './assets/onder.json',
+    left: './assets/links.json',
+    right: './assets/rechts.json'
+};
+
+const clearDefaultTimer = () => {
+    if (resetToDefaultTimer) {
+        clearTimeout(resetToDefaultTimer);
+        resetToDefaultTimer = null;
+    }
+};
+
+const showDefaultState = (label = 'no emotion detected') => {
+    clearDefaultTimer();
+
+    if (currentAnimation) {
+        currentAnimation.destroy();
+        currentAnimation = null;
+    }
+
+    if ($emotiesTekst) {
+        $emotiesTekst.textContent = label;
+    }
+
+    if ($emotionAnimation) {
+        $emotionAnimation.style.display = 'none';
+        $emotionAnimation.innerHTML = '';
+    }
+
+    if ($defaultImage) {
+        $defaultImage.style.display = 'flex';
+    }
+};
+
+const showEmotionAnimation = (assetPath, label) => {
+    if (!$emoties || !$emotionAnimation || !$defaultImage) {
+        return;
+    }
+
+    clearDefaultTimer();
+
+    if ($emotiesTekst) {
+        $emotiesTekst.textContent = label;
+    }
+
+    $defaultImage.style.display = 'none';
+    $emotionAnimation.style.display = 'block';
+    $emotionAnimation.innerHTML = '';
+
+    if (!window.lottie) {
+        showDefaultState('no emotion detected');
+        return;
+    }
+
+    if (currentAnimation) {
+        currentAnimation.destroy();
+        currentAnimation = null;
+    }
+
+    currentAnimation = window.lottie.loadAnimation({
+        container: $emotionAnimation,
+        renderer: 'svg',
+        loop: true,
+        autoplay: true,
+        path: assetPath
+    });
+
+    resetToDefaultTimer = setTimeout(() => {
+        showDefaultState('no emotion detected');
+    }, 2000);
+};
+```
+
+```javascript
+if (message.type === 'button') {
+            console.log(`Button ${message.value} pressed via WebRTC!`);
+            if ($emoties) {
+                $emoties.style.display = 'block';
+                showDefaultState('no emotion detected');
+            }
+        }
+
+        if (message.type === 'shake') {
+            console.log('Shake detected via WebRTC!');
+            if ($emoties) {
+                showEmotionAnimation(emotionAnimationMap.shake, 'fear detected');
+            }
+        }
+
+        if (message.type === 'swipe') {
+            console.log('Swipe detected via WebRTC!');
+            if ($emoties) {
+                showEmotionAnimation(emotionAnimationMap.swipe, 'laugh detected');
+            }
+        }
+
+        if (message.type === 'tap') {
+            console.log('Tap detected via WebRTC!');
+            if ($emoties) {
+                showEmotionAnimation(emotionAnimationMap.tap, 'anger detected');
+            }
+        }
+
+        if (message.type === 'pinch') {
+            console.log('Pinch detected via WebRTC!');
+            if ($emoties) {
+                showEmotionAnimation(emotionAnimationMap.pinch, 'disgust detected');
+            }
+        }
+
+        if (message.type === 'tilt') {
+            console.log('Tilt detected via WebRTC!', message.direction);
+            if ($emoties) {
+                const directionAsset = directionAnimationMap[message.direction];
+                if (directionAsset) {
+                    showEmotionAnimation(directionAsset, 'looking detected (' + message.direction + ')');
+                } else {
+                    showDefaultState('no emotion detected');
+                }
+            }
+        }
+```
+
+
+#### index.css:
+- CSS bijgewerkt voor nieuwe elementen
+```css
+#emotionAnimation {
+    width: 25rem;
+    min-height: 25rem;
+}
+```
