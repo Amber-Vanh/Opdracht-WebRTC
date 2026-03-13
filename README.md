@@ -34,10 +34,10 @@
 - gsm ui verbeteren -> duidelijke instructies, minimalistisch design -> css OK
 - images toevoegen bij het detecteren van emoties -> PROBLEEM
 ### TEGEN 19/03
-- code consistentie -> camelCase functies + soort functie hetzelfde houden
-- script in html aanpassen naar script type module
-- js -> init zonder domcontent maar gwn init()
-- probleem met images oplossen
+- code consistentie -> camelCase functies + soort functie hetzelfde houden OK
+- script in html aanpassen naar script type module OK
+- js -> init zonder domcontent maar gwn init() OK
+- probleem met images oplossen 
 - karakter en emoties animeren 
 - overgangen tussen de emoties maken
 - extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop)

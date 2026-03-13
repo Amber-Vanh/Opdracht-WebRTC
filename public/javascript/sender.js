@@ -37,7 +37,7 @@ const getUrlParameter = (name) => {
 };
 
 //test button
-const TestButton = () => {
+const testButton = () => {
     $button.addEventListener('click', () => {
         if (peer && peer.connected) {
             peer.send(JSON.stringify({ type: 'button', value: 'test' }));
@@ -185,7 +185,7 @@ const tiltDetection = () => {
 };
 
 const init = () => {
-    TestButton();
+    testButton();
     shakeDetection();
     swipeDetection();
     tapDetection();
@@ -207,8 +207,4 @@ socket.on('signal', (peerId, signal) => {
     peer.signal(signal);
 });
 
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
-} else {
-    init();
-}
+init();
