@@ -1515,8 +1515,8 @@ const triggerSenderSound = (sound) => {
     }));
 };
 ```
-
--> Bij de 4 verschillende "looking" ga ik ook nog geluid toevoegen
+### Extra
+-> Bij tilt ga ik ook nog geluid toevoegen
 -> bij fear moet ik het geluid nog downloaden (maximum van 4 downloads per uur :/)
 
 ```javascript
@@ -1533,4 +1533,4 @@ const triggerSenderSound = (sound) => {
             }
         }
 ```
--> bij tilt ook geluid toegevoegd
+
