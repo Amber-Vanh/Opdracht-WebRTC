@@ -206,6 +206,7 @@ const connectPeer = (peerId) => {
                 const directionAsset = directionAnimationMap[message.direction];
                 if (directionAsset) {
                     showEmotionAnimation(directionAsset, 'looking detected (' + message.direction + ')', 'looking');
+                    triggerSenderSound('looking');
                 } else {
                     showDefaultState('no emotion detected');
                 }

@@ -1515,3 +1515,22 @@ const triggerSenderSound = (sound) => {
     }));
 };
 ```
+
+-> Bij de 4 verschillende "looking" ga ik ook nog geluid toevoegen
+-> bij fear moet ik het geluid nog downloaden (maximum van 4 downloads per uur :/)
+
+```javascript
+        if (message.type === 'tilt') {
+            console.log('Tilt detected via WebRTC!', message.direction);
+            if ($emoties) {
+                const directionAsset = directionAnimationMap[message.direction];
+                if (directionAsset) {
+                    showEmotionAnimation(directionAsset, 'looking detected (' + message.direction + ')');
+                    triggerSenderSound('looking');
+                } else {
+                    showDefaultState('no emotion detected');
+                }
+            }
+        }
+```
+-> bij tilt ook geluid toegevoegd
