@@ -109,7 +109,7 @@ const swipeDetection = () => {
         velocity: 0.3
     });
 
-    hammer.on('swipe', (event) => {
+    hammer.on('swipe', () => {
         if (peer && peer.connected) {
             peer.send(JSON.stringify({
                 type: "swipe",
@@ -128,7 +128,7 @@ const tapDetection = () => {
     }
 
     const hammer = new Hammer(area);
-    hammer.on('tap', (event) => {
+    hammer.on('tap', () => {
         console.log("Tap detected!");
         if (peer && peer.connected) {
             peer.send(JSON.stringify({ type: "tap", emotion: "anger" }));

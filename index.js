@@ -18,20 +18,17 @@ server.listen(port, () => {
 
 const io = require('socket.io')(server);
 
-// Globals
 const clients = {};
 
 // socket event handlers
 const handleConnection = (socket) => {
   clients[socket.id] = { id: socket.id };
   console.log(`Client connected: ${socket.id}`);
-  io.emit('clients', clients);
 };
 
 const handleDisconnect = (socket) => {
   delete clients[socket.id];
   console.log(`Client disconnected: ${socket.id}`);
-  io.emit('clients', clients);
 };
 
 const handleSignal = (socket, peerId, signal) => {

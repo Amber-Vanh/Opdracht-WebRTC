@@ -44,7 +44,6 @@
 - extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop) OK
 ### TEGEN 22/03 = DEADLINE
 - code simplifieren -> geen shake doorsturen wel de emotie, 1 if block voor alle emoties (index2.js)
-- laatste problemen oplossen, testen, finetunen
 - zorg voor consistentie in code (camelCase, functie-soort)
 
 
@@ -1668,3 +1667,35 @@ const showEmotionAnimation = (assetPath, sound) => {
 - voor het uitleggen van code is Ai handig, ik snap wel deels wat de code doet maar heb graag de bevestiging
 - voor het opschonen is het ook zeer handig, ik kijk soms over stukken code of besef niet dat het overbodig is
 
+### Ai toont welke code nog weg mag
+Ja. Ik heb alles nagekeken en dit is je concrete opschoonlijst.
+
+Findings (hoogste impact eerst)
+
+Ongebruikte server-state en events in index.js:21
+Je houdt een clients object bij en emit telkens clients bij connect/disconnect op index.js:28 en index.js:34, maar in de frontend is geen listener voor clients. Dit blok is overbodig als je geen clientlijst toont.
+
+Overbodige HTML-node op desktop in index.html:17
+Element met id emotiesTekst staat in HTML, maar wordt niet meer gebruikt in de huidige index2.js. Je kan deze div veilig verwijderen als je geen status-tekst toont.
+
+Verborgen elementen zonder functie in index.html:13 en index.css:13
+Titel en url staan in HTML, maar worden altijd verborgen via CSS op index.css:13 en index.css:24. Kies één richting:
+
+Of tonen en CSS-regels weghalen
+Of volledig verwijderen uit HTML
+Kleine dode stijlregels in sender.css:37
+In #area staan tekststijlen (color, font-size, font-weight) terwijl er geen tekst in #area staat in sender.html:17. Deze regels zijn functioneel overbodig.
+
+Ongebruikte callback-parameters in sender.js:112 en sender.js:131
+De parameter event in swipe en tap handlers wordt niet gebruikt. Mag weg voor nettere code.
+
+Consistentiecheck: goed
+
+Audio ids en mapping zijn consistent tussen sender.html:19 en sender.js:1.
+Assets bestaan voor alle huidige verwijzingen (json en mp3).
+Geen editor errors gevonden.
+Open keuze (niet fout, wel opruimmogelijkheid)
+
+Node modules statisch serven op index.js:14 is enkel nodig voor Hammer script in sender.html:29.
+Als je Hammer via CDN laadt, kan deze route weg. Dat is netter en veiliger.
+Als je wil, kan ik dit nu in één cleanup-commit voor je uitvoeren met alleen veilige verwijderingen (zonder gedrag te veranderen).
