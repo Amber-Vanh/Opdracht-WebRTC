@@ -1,5 +1,4 @@
 const $peerSelect = document.getElementById('peerSelect');
-const $button = document.getElementById('testButton');
 const $defaultAudio = document.getElementById('defaultAudio');
 const $fearAudio = document.getElementById('fear');
 const $laughAudio = document.getElementById('laugh');
@@ -74,15 +73,6 @@ const getUrlParameter = (name) => {
     const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
     const results = regex.exec(location.search);
     return results === null ? false : decodeURIComponent(results[1].replace(/\+/g, ' '));
-};
-
-//test button
-const testButton = () => {
-    $button.addEventListener('click', () => {
-        if (peer && peer.connected) {
-            peer.send(JSON.stringify({ type: 'button', value: 'test' }));
-        }
-    });
 };
 
 // BANG
@@ -225,7 +215,6 @@ const tiltDetection = () => {
 };
 
 const init = () => {
-    testButton();
     shakeDetection();
     swipeDetection();
     tapDetection();

@@ -2,7 +2,7 @@
     --color-purple: #6b4dd1;
     --color-Lpurple: #e1c3ff;
     --color-Dpurple: #362061;
-    --color-yellow: #f4cf43;
+    --color-yellow: #feba00;
     --color-beige: #fff9f1;
 }
 
@@ -12,20 +12,6 @@ body {
     padding: 10px;
     font-family: Arial, sans-serif;
     touch-action: none;
-}
-
-button {
-    padding: 10px 20px;
-    font-size: 16px;
-    margin-bottom: 20px;
-    cursor: pointer;
-    background-color: var(--color-purple);
-    border: var(--color-Dpurple) 2px solid;
-    border-radius: 8px;
-    color: var(--color-Lpurple);
-
-    display: flex;
-    justify-self: center;
 }
 
 .title,
@@ -42,8 +28,7 @@ button {
 #area {
     width: 100%;
     height: 300px;
-    /*background: linear-gradient(135deg, #362061 0%, #e1c3ff 100%);*/
-    background-color: var(--color-Lpurple);
+    background-color: var(--color-yellow);
     border-radius: 10px;
     margin: 20px 0;
     display: flex;

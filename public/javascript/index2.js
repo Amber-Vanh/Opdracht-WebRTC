@@ -164,14 +164,6 @@ const connectPeer = (peerId) => {
         console.log('Received data:', data.toString());
         const message = JSON.parse(data.toString());
 
-        if (message.type === 'button') {
-            console.log(`Button ${message.value} pressed via WebRTC!`);
-            if ($emoties) {
-                $emoties.style.display = 'block';
-                showDefaultState('no emotion detected');
-            }
-        }
-
         if (message.type === 'shake') {
             console.log('Shake detected via WebRTC!');
             if ($emoties) {

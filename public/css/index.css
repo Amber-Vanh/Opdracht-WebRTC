@@ -10,27 +10,11 @@ body {
     background-color: var(--color-beige);
 }
 
-/*
-.emoties {
-    width: max-content;
-    height: max-content;
-    margin: 10px;
-    background-color: var(--color-yellow);
-    padding: 1rem;
-    display: flex;
-    align-self: center;
-    justify-self: center;
-    font-size: 40px;
-}
-*/
-/*
 .url {
     display: none;
 }
-*/
 
 .titel,
-.url,
 .qr {
     display: flex;
     align-self: center;
@@ -40,6 +24,7 @@ body {
 .titel {
     font-size: 50px;
     color: var(--color-Dpurple);
+    display: none;
 }
 
 .qr {
