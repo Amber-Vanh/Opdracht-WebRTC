@@ -38,7 +38,8 @@
 - script in html aanpassen naar script type module OK
 - js -> init zonder domcontent maar gwn init() OK
 - probleem met images oplossen OK
-- karakter en emoties animeren 
+- karakter en emoties animeren OK
+- animaties tonen bij het detecteren van emoties + standaard gezicht tonen als er geen emotie is 
 - overgangen tussen de emoties maken 
 - extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop) 
 ### TEGEN 22/03 = DEADLINE
