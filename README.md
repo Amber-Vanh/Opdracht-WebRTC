@@ -1699,3 +1699,11 @@ Open keuze (niet fout, wel opruimmogelijkheid)
 Node modules statisch serven op index.js:14 is enkel nodig voor Hammer script in sender.html:29.
 Als je Hammer via CDN laadt, kan deze route weg. Dat is netter en veiliger.
 Als je wil, kan ik dit nu in één cleanup-commit voor je uitvoeren met alleen veilige verwijderingen (zonder gedrag te veranderen).
+
+## Irritatie opgemerkt
+Nu als je de qr code verbindt moet je eerst op je scherm tikken om de audio permission te geven.
+Kan ik dit niet automatisch laten triggeren bij het verbinden van de peer? Of is er een manier om dit te vragen nog voor het verbinden?
+- iOS vereist een user gesture (zoals een tap) om audio af te spelen, dus automatisch triggeren zonder interactie is niet mogelijk vanwege browserbeperkingen.
+- Je zou een duidelijke call-to-action kunnen tonen op het scherm zodra de peer verbinding maakt,zoals "Tap to enable sound", om gebruikers aan te moedigen de benodigde toestemming te geven. Maar uiteindelijk is een tap nodig om audio te kunnen afspelen op iOS.
+
+-> CTA toegevoegd aan sender.html om gebruikers te vragen te tikken voor audio toestemming

@@ -15,6 +15,7 @@ body {
 }
 
 .title,
+.activation,
 .description {
     text-align: center;
 }
