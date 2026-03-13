@@ -41,7 +41,7 @@
 - karakter en emoties animeren OK
 - animaties tonen bij het detecteren van emoties + standaard gezicht tonen als er geen emotie is OK
 - overgangen tussen de emoties maken OK
-- extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop) 
+- extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop) OK
 ### TEGEN 22/03 = DEADLINE
 - code simplifieren -> geen shake doorsturen wel de emotie, 1 if block voor alle emoties (index2.js)
 - laatste problemen oplossen, testen, finetunen
@@ -1422,44 +1422,96 @@ if (message.type === 'button') {
 
 
 ## Geluid toevoegen bij emotie detectie
-#### index.html
+#### sender.html -> geluid speelt af op gsm
 ```html
-<audio id="fearAudio" src="./assets/fear.mp3"></audio>
-<audio id="laughAudio" src="./assets/laugh.mp3"></audio>
-<audio id="angryAudio" src="./assets/angry.mp3"></audio>
-<audio id="disgustAudio" src="./assets/disgust.mp3"></audio>
-<audio id="lookingAudio" src="./assets/looking.mp3"></audio>
+    <audio id="defaultAudio" src="/public/assets/music_smt_Velocity_035.mp3"></audio>
+    <audio id="fear" src="/public/assets/fear.mp3"></audio>
+    <audio id="laugh" src="/public/assets/laugh.mp3"></audio>
+    <audio id="anger" src="/public/assets/anger.mp3"></audio>
+    <audio id="disgust" src="/public/assets/disgust.mp3"></audio>
 ```
--> audio elementen toegevoegd voor elke emotie
-#### index2.js
-```javascript
-const emotionAudioMap = {
-    shake: document.getElementById('fearAudio'),
-    swipe: document.getElementById('laughAudio'),
-    tap: document.getElementById('angryAudio'),
-    pinch: document.getElementById('disgustAudio'),
-    tilt: document.getElementById('lookingAudio')
-};  
+
+#### prompt
+```
+oke ik heb het in de sender.html de audio files geplaatst, hoe kan ik er nu voor zorgen dat wanneer de animatie zichtbaar is op de desktop, het geluid wordt afgespeeld op de gsm?
+```
 
 ```
--> mapping van emotie types naar audio elementen
+Desktop stuurt nu een extra WebRTC-bericht playSound wanneer een animatie getoond wordt:
+- index2.js:33
+- index2.js:101
+- En per emotie-event: index2.js:171, index2.js:178, index2.js:185, index2.js:192, index2.js:201
+
+Sender luistert nu naar inkomende playSound-berichten en speelt het juiste audio-element af:
+- sender.js:3
+- sender.js:14
+- sender.js:23
+- sender.js:50
+
+Je audiopaden in de sender-html zijn gecorrigeerd (Express serveert vanuit public, dus pad moet /assets/... zijn, niet /public/assets/...):
+- sender.html:19
+```
+
+#### sender.html
+```html
+    <!-- <audio id="defaultAudio" src="/assets/music_smt_Velocity_035.mp3" preload="auto"></audio> -->
+    <audio id="fear" src="/assets/fear.mp3" preload="auto"></audio>
+    <audio id="laugh" src="/assets/laugh.mp3" preload="auto"></audio>
+    <audio id="anger" src="/assets/anger.mp3" preload="auto"></audio>
+    <audio id="disgust" src="/assets/disgust.mp3" preload="auto"></audio>
+```
+-> de algemene muziek op de achtergrond was er iets te veel aan
+
+#### sender.js
 ```javascript
-const playEmotionAudio = (type) => {
-    const audio = emotionAudioMap[type];
-    if (audio) {
-        audio.currentTime = 0; 
-        audio.play();
+const audioBySound = {
+    default: $defaultAudio,
+    fear: $fearAudio,
+    laugh: $laughAudio,
+    anger: $angerAudio,
+    disgust: $disgustAudio,
+    looking: $defaultAudio
+};
+
+const playSound = (sound) => {
+    const selectedAudio = audioBySound[sound] || $defaultAudio;
+    if (!selectedAudio) {
+        return;
     }
+
+    selectedAudio.currentTime = 0;
+    selectedAudio.play().catch(err => {
+        console.warn('Audio play was blocked or failed:', err);
+
+        if (selectedAudio !== $defaultAudio && $defaultAudio) {
+            $defaultAudio.currentTime = 0;
+            $defaultAudio.play().catch(fallbackErr => {
+                console.warn('Fallback audio failed:', fallbackErr);
+            });
+        }
+    });
 };
 ```
--> functie om audio af te spelen bij emotie detectie
+
 ```javascript
-if (message.type === 'shake') {
-    console.log('Shake detected via WebRTC!');
-    if ($emoties) {
-        showEmotionAnimation(emotionAnimationMap.shake, 'fear detected');
-        playEmotionAudio('shake');
-    }
-}
+    peer.on('data', data => {
+        const message = JSON.parse(data.toString());
+        if (message.type === 'playSound') {
+            playSound(message.sound);
+        }
+    });
 ```
--> bij elke emotie detectie wordt nu ook de bijhorende audio afgespeeld bij shake, swipe, tap, pinch en tilt events.
+
+#### index2.js
+```javascript
+const triggerSenderSound = (sound) => {
+    if (!currentPeer || !currentPeer.connected) {
+        return;
+    }
+
+    currentPeer.send(JSON.stringify({
+        type: 'playSound',
+        sound
+    }));
+};
+```

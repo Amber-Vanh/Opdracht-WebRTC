@@ -11,10 +11,17 @@
 
 <body>
     <h1 class="title">Welcome</h1>
-    <p class="description">Probeer de emotie van het karakter te veranderen door te schudden, te swipen, te tikken, te pinchen of je scherm te kantelen.</p>
+    <p class="description">Probeer de emotie van het karakter te veranderen door te schudden, te swipen, te tikken, te
+        pinchen of je scherm te kantelen.</p>
     <button id="testButton">Klik</button>
 
     <div id="area"></div>
+
+    <!-- <audio id="defaultAudio" src="/assets/music_smt_Velocity_035.mp3" preload="auto"></audio> -->
+    <audio id="fear" src="/assets/fear.mp3" preload="auto"></audio>
+    <audio id="laugh" src="/assets/laugh.mp3" preload="auto"></audio>
+    <audio id="anger" src="/assets/anger.mp3" preload="auto"></audio>
+    <audio id="disgust" src="/assets/disgust.mp3" preload="auto"></audio>
 
     <script src="/socket.io/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/simple-peer/9.11.1/simplepeer.min.js"

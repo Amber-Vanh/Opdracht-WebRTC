@@ -1,9 +1,42 @@
 const $peerSelect = document.getElementById('peerSelect');
 const $button = document.getElementById('testButton');
+const $defaultAudio = document.getElementById('defaultAudio');
+const $fearAudio = document.getElementById('fear');
+const $laughAudio = document.getElementById('laugh');
+const $angerAudio = document.getElementById('anger');
+const $disgustAudio = document.getElementById('disgust');
 
 const socket = io();
 let targetSocketId;
 let peer;
+
+const audioBySound = {
+    default: $defaultAudio,
+    fear: $fearAudio,
+    laugh: $laughAudio,
+    anger: $angerAudio,
+    disgust: $disgustAudio,
+    looking: $defaultAudio
+};
+
+const playSound = (sound) => {
+    const selectedAudio = audioBySound[sound] || $defaultAudio;
+    if (!selectedAudio) {
+        return;
+    }
+
+    selectedAudio.currentTime = 0;
+    selectedAudio.play().catch(err => {
+        console.warn('Audio play was blocked or failed:', err);
+
+        if (selectedAudio !== $defaultAudio && $defaultAudio) {
+            $defaultAudio.currentTime = 0;
+            $defaultAudio.play().catch(fallbackErr => {
+                console.warn('Fallback audio failed:', fallbackErr);
+            });
+        }
+    });
+};
 
 // WebRTC setup
 const createPeer = () => {
@@ -23,6 +56,13 @@ const createPeer = () => {
 
     peer.on('connect', () => {
         console.log(`Connected to desktop!`);
+    });
+
+    peer.on('data', data => {
+        const message = JSON.parse(data.toString());
+        if (message.type === 'playSound') {
+            playSound(message.sound);
+        }
     });
 
     peer.on('error', err => {

@@ -30,6 +30,17 @@ const clearDefaultTimer = () => {
     }
 };
 
+const triggerSenderSound = (sound) => {
+    if (!currentPeer || !currentPeer.connected) {
+        return;
+    }
+
+    currentPeer.send(JSON.stringify({
+        type: 'playSound',
+        sound
+    }));
+};
+
 const showDefaultState = (label = 'no emotion detected') => {
     clearDefaultTimer();
 
@@ -50,9 +61,11 @@ const showDefaultState = (label = 'no emotion detected') => {
     if ($defaultImage) {
         $defaultImage.style.display = 'flex';
     }
+
+    triggerSenderSound('default');
 };
 
-const showEmotionAnimation = (assetPath, label) => {
+const showEmotionAnimation = (assetPath, label, sound) => {
     if (!$emoties || !$emotionAnimation || !$defaultImage) {
         return;
     }
@@ -84,6 +97,8 @@ const showEmotionAnimation = (assetPath, label) => {
         autoplay: true,
         path: assetPath
     });
+
+    triggerSenderSound(sound);
 
     resetToDefaultTimer = setTimeout(() => {
         showDefaultState('no emotion detected');
@@ -160,28 +175,28 @@ const connectPeer = (peerId) => {
         if (message.type === 'shake') {
             console.log('Shake detected via WebRTC!');
             if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.shake, 'fear detected');
+                showEmotionAnimation(emotionAnimationMap.shake, 'fear detected', 'fear');
             }
         }
 
         if (message.type === 'swipe') {
             console.log('Swipe detected via WebRTC!');
             if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.swipe, 'laugh detected');
+                showEmotionAnimation(emotionAnimationMap.swipe, 'laugh detected', 'laugh');
             }
         }
 
         if (message.type === 'tap') {
             console.log('Tap detected via WebRTC!');
             if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.tap, 'anger detected');
+                showEmotionAnimation(emotionAnimationMap.tap, 'anger detected', 'anger');
             }
         }
 
         if (message.type === 'pinch') {
             console.log('Pinch detected via WebRTC!');
             if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.pinch, 'disgust detected');
+                showEmotionAnimation(emotionAnimationMap.pinch, 'disgust detected', 'disgust');
             }
         }
 
@@ -190,7 +205,7 @@ const connectPeer = (peerId) => {
             if ($emoties) {
                 const directionAsset = directionAnimationMap[message.direction];
                 if (directionAsset) {
-                    showEmotionAnimation(directionAsset, 'looking detected (' + message.direction + ')');
+                    showEmotionAnimation(directionAsset, 'looking detected (' + message.direction + ')', 'looking');
                 } else {
                     showDefaultState('no emotion detected');
                 }
