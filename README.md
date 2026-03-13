@@ -44,7 +44,7 @@
 - extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop) OK
 ### TEGEN 22/03 = DEADLINE
 - code simplifieren -> geen shake doorsturen wel de emotie, 1 if block voor alle emoties (index2.js)
-- zorg voor consistentie in code (camelCase, functie-soort)
+- zorg voor consistentie in code (camelCase, functie-soort) OK
 
 
 # Briefing
