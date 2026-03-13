@@ -1415,3 +1415,51 @@ if (message.type === 'button') {
     min-height: 25rem;
 }
 ```
+
+### Reflectie op AI gebruik
+- ik had echt geen idee hoe ik dit moest aanpakken
+- ik snap wat er is gebeurd maar ik weet niet of ik dit zelf had kunnen bedenken
+
+
+## Geluid toevoegen bij emotie detectie
+#### index.html
+```html
+<audio id="fearAudio" src="./assets/fear.mp3"></audio>
+<audio id="laughAudio" src="./assets/laugh.mp3"></audio>
+<audio id="angryAudio" src="./assets/angry.mp3"></audio>
+<audio id="disgustAudio" src="./assets/disgust.mp3"></audio>
+<audio id="lookingAudio" src="./assets/looking.mp3"></audio>
+```
+-> audio elementen toegevoegd voor elke emotie
+#### index2.js
+```javascript
+const emotionAudioMap = {
+    shake: document.getElementById('fearAudio'),
+    swipe: document.getElementById('laughAudio'),
+    tap: document.getElementById('angryAudio'),
+    pinch: document.getElementById('disgustAudio'),
+    tilt: document.getElementById('lookingAudio')
+};  
+
+```
+-> mapping van emotie types naar audio elementen
+```javascript
+const playEmotionAudio = (type) => {
+    const audio = emotionAudioMap[type];
+    if (audio) {
+        audio.currentTime = 0; 
+        audio.play();
+    }
+};
+```
+-> functie om audio af te spelen bij emotie detectie
+```javascript
+if (message.type === 'shake') {
+    console.log('Shake detected via WebRTC!');
+    if ($emoties) {
+        showEmotionAnimation(emotionAnimationMap.shake, 'fear detected');
+        playEmotionAudio('shake');
+    }
+}
+```
+-> bij elke emotie detectie wordt nu ook de bijhorende audio afgespeeld bij shake, swipe, tap, pinch en tilt events.
