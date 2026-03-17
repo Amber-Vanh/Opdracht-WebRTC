@@ -336,7 +336,14 @@ WebRTC
 - planning week 4 gedetailleerder maken -> per feature
 
 ## 12/03
+- zorg voor code consistentie -> camelCase functies + soort functie hetzelfde houden
+- script in html aanpassen naar script type module
+- js -> init zonder domcontent maar gwn init()
+- probleem met images oplossen -> debugs plaatsen in inspector
+
+## 19/03
 - 
+
 
 # Code
 ## foutmelding qr-code
