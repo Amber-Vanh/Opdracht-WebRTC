@@ -43,8 +43,9 @@
 - overgangen tussen de emoties maken OK
 - extra features toevoegen (bv. geluid op gsm bij emotie tonen op desktop) OK
 ### TEGEN 22/03 = DEADLINE
-- code simplifieren -> geen shake doorsturen wel de emotie, 1 if block voor alle emoties (index2.js)
+- code simplifieren OK
 - zorg voor consistentie in code (camelCase, functie-soort) OK
+- feedback implementeren
 
 # Briefing
 ### Minimaal
@@ -1706,3 +1707,273 @@ Kan ik dit niet automatisch laten triggeren bij het verbinden van de peer? Of is
 - Je zou een duidelijke call-to-action kunnen tonen op het scherm zodra de peer verbinding maakt,zoals "Tap to enable sound", om gebruikers aan te moedigen de benodigde toestemming te geven. Maar uiteindelijk is een tap nodig om audio te kunnen afspelen op iOS.
 
 -> CTA toegevoegd aan sender.html om gebruikers te vragen te tikken voor audio toestemming
+
+## Code simplifieren
+Biggest wins are in JS:
+- index2.js:161: five separate message.type if-blocks can be replaced by one mapping object + one handler (this is the largest simplification).
+- index2.js:128: QR generation can be one-liner style (inline constants) since typeNumber/errorCorrectionLevel are fixed.
+- sender.js:1: five separate audio element variables can be reduced to a small array/map initializer.
+- sender.js:64: getUrlParameter regex helper can be replaced by URLSearchParams, which is shorter and clearer.
+- sender.js:88: repeated peer && peer.connected checks can be wrapped in one sendIfConnected helper and reused in shake/swipe/tap/pinch/tilt handlers.
+
+Smaller CSS cleanups:
+- sender.css:24: margin: 0rem auto + margin-bottom can be merged into one shorthand.
+
+Files that are already concise enough:
+- index.html
+- sender.html
+- package.json
+
+### index2.js
+161: five separate message.type if-blocks can be replaced by one mapping object + one handler (this is the largest simplification).
+
+#### Originele code
+```javascript
+if (message.type === 'shake') {
+            console.log('Shake detected via WebRTC!');
+            if ($emoties) {
+                showEmotionAnimation(emotionAnimationMap.shake, 'fear');
+            }
+        }
+
+        if (message.type === 'swipe') {
+            console.log('Swipe detected via WebRTC!');
+            if ($emoties) {
+                showEmotionAnimation(emotionAnimationMap.swipe, 'laugh');
+            }
+        }
+
+        if (message.type === 'tap') {
+            console.log('Tap detected via WebRTC!');
+            if ($emoties) {
+                showEmotionAnimation(emotionAnimationMap.tap, 'anger');
+            }
+        }
+
+        if (message.type === 'pinch') {
+            console.log('Pinch detected via WebRTC!');
+            if ($emoties) {
+                showEmotionAnimation(emotionAnimationMap.pinch, 'disgust');
+            }
+        }
+
+        if (message.type === 'tilt') {
+            console.log('Tilt detected via WebRTC!', message.direction);
+            if ($emoties) {
+                const directionAsset = directionAnimationMap[message.direction];
+                if (directionAsset) {
+                    showEmotionAnimation(directionAsset, 'looking');
+                } else {
+                    showDefaultState();
+                }
+            }
+        }
+```
+#### Vereenvoudigde code
+```javascript
+const emotionHandlers = {
+    shake: () => {
+        console.log('Shake detected via WebRTC!');
+        if ($emoties) {
+            showEmotionAnimation(emotionAnimationMap.shake, 'fear');
+        }
+    }, 
+    swipe: () => {
+        console.log('Swipe detected via WebRTC!');
+        if ($emoties) {
+            showEmotionAnimation(emotionAnimationMap.swipe, 'laugh');
+        }
+    },
+    tap: () => {
+        console.log('Tap detected via WebRTC!');
+        if ($emoties) {
+            showEmotionAnimation(emotionAnimationMap.tap, 'anger');
+        }
+    },
+    pinch: () => {
+        console.log('Pinch detected via WebRTC!');
+        if ($emoties) { 
+            showEmotionAnimation(emotionAnimationMap.pinch, 'disgust');
+        }
+    },
+    tilt: () => {
+        console.log('Tilt detected via WebRTC!', message.direction);
+        if ($emoties) {
+            const directionAsset = directionAnimationMap[message.direction];
+            if (directionAsset) {
+                showEmotionAnimation(directionAsset, 'looking');
+            } else {
+                showDefaultState();
+            }
+        }
+    }
+};
+```
+
+-> alle verkortingen dat AI voorstelde werkten niet dus heb ik het op deze manier opgelost
+-> is ook overzichtelijker omdat het in een "const" zit
+
+#### Origele code
+```javascript
+const generateQRCode = (url) => {
+    const typeNumber = 4;
+    const errorCorrectionLevel = 'L';
+    const qr = qrcode(typeNumber, errorCorrectionLevel);
+    qr.addData(url);
+    qr.make();
+    $qr.innerHTML = qr.createImgTag(3);
+    console.log('Controller URL:', url);
+};
+```
+
+#### Vereenvoudigde code
+```javascript
+const generateQRCode = (url) => {
+    const qr = qrcode(4, 'L');
+    qr.addData(url);
+    qr.make();
+    $qr.innerHTML = qr.createImgTag(3);
+    console.log('Controller URL:', url);
+};
+```
+-> deze verkorting is gewoon van meerdere lijnen 1 maken
+
+### Sender.js
+#### Orignele code
+```javascript
+const $fearAudio = document.getElementById('fear');
+const $laughAudio = document.getElementById('laugh');
+const $angerAudio = document.getElementById('anger');
+const $disgustAudio = document.getElementById('disgust');
+const $tiltAudio = document.getElementById('tilt');
+
+const audioBySound = {
+    fear: $fearAudio,
+    laugh: $laughAudio,
+    anger: $angerAudio,
+    disgust: $disgustAudio,
+    looking: $tiltAudio
+};
+```
+
+#### Vereenvoudigde code
+```javascript
+const audioBySound = Object.fromEntries([
+    ['fear', 'fear'],
+    ['laugh', 'laugh'],
+    ['anger', 'anger'],
+    ['disgust', 'disgust'],
+    ['looking', 'tilt']
+].map(([sound, id]) => [sound, document.getElementById(id)]));
+```
+- ['sound', 'id'] => links is de naam van het bericht dat je binnenkrijgt, rechts is de id van het audio element in de HTML
+- map => zoekt het element via id + maakt nieuwe paren en zet het om naar een object
+```javascript
+{
+  fear: <audio id="fear">,
+  laugh: <audio id="laugh">,
+  anger: <audio id="anger">,
+  disgust: <audio id="disgust">,
+  looking: <audio id="tilt">
+}
+```
+#### Originele code
+```javascript
+const getUrlParameter = (name) => {
+    const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    const results = regex.exec(location.search);
+    return results === null ? false : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
+```
+
+#### Vereenvoudigde code
+```javascript
+const getUrlParameter = (name) => new URLSearchParams(window.location.search).get(name);
+```
+- code is veel korter en duidelijker, URLSearchParams is een native API die precies doet wat we willen: de query parameters parsen en de waarde van een specifieke parameter teruggeven. Geen regex nodig!
+
+#### Originele code
+```javascript
+        if (peer && peer.connected) {
+            peer.send(JSON.stringify({
+                type: "swipe",
+                emotion: "laugh"
+            }));
+        }
+```
+- dit voor elke emotie
+
+#### Vereenvoudigde code
+```javascript
+const sendIfConnected = (payload, onDisconnected) => {
+    if (!peer || !peer.connected) {
+        if (onDisconnected) onDisconnected();
+        return false;
+    }
+    peer.send(JSON.stringify(payload));
+    return true;
+};
+```
+bundel 3 dingen die je anders telkens opnieuw schrijft
+- check of peer bestaat en connected is
+- stuurt data als er verbinding is
+- geeft terug als het gelukt is of niet (true= verzonden/false = niet verzonden)
+
+```javascript
+    sendIfConnected({ type: "shake", emotion: "fear" });
+```
+- dit voor elke emotie
+
+### Sender.css
+#### Originele code
+```css
+.description {
+    margin: 0rem auto;
+    margin-bottom: 1rem;
+    max-width: 90%;
+}
+```
+#### Vereenvoudigde code
+```css
+.description {
+    margin: 0 auto 1rem;
+    max-width: 90%;
+}
+```
+
+## Console logs
+### Sender.js
+Kan weg (optioneel, vooral debug):
+- sender.js:89 console.log("Shake detected!")
+- sender.js:130 console.log("Tap detected!")
+- sender.js:134 console.log('Tap detection initialized on area')
+- sender.js:43 console.log('Connected to desktop!') (mag blijven als je connect-feedback wil)
+
+Best behouden:
+- sender.js:54 console.error("Peer error:", err) belangrijk bij WebRTC problemen
+- sender.js:124 console.error('Area element not found...') nuttig als HTML ooit wijzigt
+- sender.js:22 console.warn('Audio play was blocked...') nuttig voor iOS/autoplay issues
+
+Extra opmerking:
+- sender.js:153 const sent = ... wordt momenteel niet gebruikt, die variabele mag ook weg.
+
+### Index2.js
+Veilig weg te halen:
+- index2.js:132 console.log('Controller URL:', url);
+- index2.js:156 console.log('Received data:', data.toString());
+- index2.js:161 shake log
+- index2.js:167 swipe log
+- index2.js:173 tap log
+- index2.js:179 pinch log
+- index2.js:185 tilt log
+
+Optioneel (mag weg, maar soms handig tijdens testen):
+- index2.js:106 desktop connected
+- index2.js:114 smartphone connected
+- index2.js:119 received signal
+- index2.js:152 webrtc connected
+
+Er staan geen console.error of console.warn in dit bestand, dus je kan het vrij clean maken zonder belangrijke foutmeldingen te verliezen.
+
+### Meeste console logs heb ik verwijderd
+- sommige comments in index2.js heb ik gewoon in comments geplaatst, deze kunnen handig zijn mochten er problemen ontstaan in de toekomst

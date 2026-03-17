@@ -21,8 +21,7 @@ body {
 }
 
 .description {
-    margin: 0rem auto;
-    margin-bottom: 1rem;
+    margin: 0 auto 1rem;
     max-width: 90%;
 }
 

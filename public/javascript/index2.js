@@ -103,7 +103,7 @@ const initSocket = () => {
     socket = io.connect('/');
 
     socket.on('connect', () => {
-        console.log('Desktop connected:', socket.id);
+        //console.log('Desktop connected:', socket.id);
         const url = `${window.location.origin}/sender.html?id=${socket.id}`;
         $url.textContent = url;
         $url.setAttribute('href', url);
@@ -111,12 +111,12 @@ const initSocket = () => {
     });
 
     socket.on('peerReady', peerId => {
-        console.log(`Smartphone connected: ${peerId}`);
+        //console.log(`Smartphone connected: ${peerId}`);
         currentPeer = connectPeer(peerId);
     });
 
     socket.on('signal', (peerId, signal, socketId) => {
-        console.log(`Received WebRTC signal from ${socketId}`);
+        //console.log(`Received WebRTC signal from ${socketId}`);
         if (currentPeer) {
             currentPeer.signal(signal);
         }
@@ -125,9 +125,7 @@ const initSocket = () => {
 
 //qr generen
 const generateQRCode = (url) => {
-    const typeNumber = 4;
-    const errorCorrectionLevel = 'L';
-    const qr = qrcode(typeNumber, errorCorrectionLevel);
+    const qr = qrcode(4, 'L');
     qr.addData(url);
     qr.make();
     $qr.innerHTML = qr.createImgTag(3);
@@ -151,52 +149,45 @@ const connectPeer = (peerId) => {
     });
 
     peer.on('connect', () => {
-        console.log(`WebRTC connected to ${peerId}`);
+        //console.log(`WebRTC connected to ${peerId}`);
     });
 
     peer.on('data', data => {
-        console.log('Received data:', data.toString());
         const message = JSON.parse(data.toString());
 
-        if (message.type === 'shake') {
-            console.log('Shake detected via WebRTC!');
-            if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.shake, 'fear');
-            }
-        }
-
-        if (message.type === 'swipe') {
-            console.log('Swipe detected via WebRTC!');
-            if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.swipe, 'laugh');
-            }
-        }
-
-        if (message.type === 'tap') {
-            console.log('Tap detected via WebRTC!');
-            if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.tap, 'anger');
-            }
-        }
-
-        if (message.type === 'pinch') {
-            console.log('Pinch detected via WebRTC!');
-            if ($emoties) {
-                showEmotionAnimation(emotionAnimationMap.pinch, 'disgust');
-            }
-        }
-
-        if (message.type === 'tilt') {
-            console.log('Tilt detected via WebRTC!', message.direction);
-            if ($emoties) {
-                const directionAsset = directionAnimationMap[message.direction];
-                if (directionAsset) {
-                    showEmotionAnimation(directionAsset, 'looking');
-                } else {
-                    showDefaultState();
+        const emotionHandlers = {
+            shake: () => {
+                if ($emoties) {
+                    showEmotionAnimation(emotionAnimationMap.shake, 'fear');
+                }
+            },
+            swipe: () => {
+                if ($emoties) {
+                    showEmotionAnimation(emotionAnimationMap.swipe, 'laugh');
+                }
+            },
+            tap: () => {
+                if ($emoties) {
+                    showEmotionAnimation(emotionAnimationMap.tap, 'anger');
+                }
+            },
+            pinch: () => {
+                if ($emoties) {
+                    showEmotionAnimation(emotionAnimationMap.pinch, 'disgust');
+                }
+            },
+            tilt: () => {
+                if ($emoties) {
+                    const directionAsset = directionAnimationMap[message.direction];
+                    if (directionAsset) {
+                        showEmotionAnimation(directionAsset, 'looking');
+                    } else {
+                        showDefaultState();
+                    }
                 }
             }
-        }
+        };
+        emotionHandlers[message.type]?.();
     });
 
     return peer;

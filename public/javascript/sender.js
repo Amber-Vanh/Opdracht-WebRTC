@@ -1,20 +1,14 @@
-const $fearAudio = document.getElementById('fear');
-const $laughAudio = document.getElementById('laugh');
-const $angerAudio = document.getElementById('anger');
-const $disgustAudio = document.getElementById('disgust');
-const $tiltAudio = document.getElementById('tilt');
-
 const socket = io();
 let targetSocketId;
 let peer;
 
-const audioBySound = {
-    fear: $fearAudio,
-    laugh: $laughAudio,
-    anger: $angerAudio,
-    disgust: $disgustAudio,
-    looking: $tiltAudio
-};
+const audioBySound = Object.fromEntries([
+    ['fear', 'fear'],
+    ['laugh', 'laugh'],
+    ['anger', 'anger'],
+    ['disgust', 'disgust'],
+    ['looking', 'tilt']
+].map(([sound, id]) => [sound, document.getElementById(id)]));
 
 // afspelen van geluid bij emotie
 const playSound = (sound) => {
@@ -61,10 +55,18 @@ const createPeer = () => {
     });
 };
 
-const getUrlParameter = (name) => {
-    const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
-    const results = regex.exec(location.search);
-    return results === null ? false : decodeURIComponent(results[1].replace(/\+/g, ' '));
+const getUrlParameter = (name) => new URLSearchParams(window.location.search).get(name);
+
+const sendIfConnected = (payload, onDisconnected) => {
+    if (!peer || !peer.connected) {
+        if (onDisconnected) {
+            onDisconnected();
+        }
+        return false;
+    }
+
+    peer.send(JSON.stringify(payload));
+    return true;
 };
 
 // BANG
@@ -84,10 +86,7 @@ const shakeDetection = () => {
             const deltaZ = Math.abs(acc.z - (lastZ || 0));
 
             if (deltaX + deltaY + deltaZ > 10) {
-                console.log("Shake detected!");
-                if (peer && peer.connected) {
-                    peer.send(JSON.stringify({ type: "shake", emotion: "fear" }));
-                }
+                sendIfConnected({ type: "shake", emotion: "fear" });
             }
 
             lastX = acc.x;
@@ -110,32 +109,21 @@ const swipeDetection = () => {
     });
 
     hammer.on('swipe', () => {
-        if (peer && peer.connected) {
-            peer.send(JSON.stringify({
-                type: "swipe",
-                emotion: "laugh"
-            }));
-        }
+        sendIfConnected({
+            type: "swipe",
+            emotion: "laugh"
+        });
     });
 };
 
 // BOOS
 const tapDetection = () => {
     const area = document.getElementById('area');
-    if (!area) {
-        console.error('Area element not found for tap detection');
-        return;
-    }
 
     const hammer = new Hammer(area);
     hammer.on('tap', () => {
-        console.log("Tap detected!");
-        if (peer && peer.connected) {
-            peer.send(JSON.stringify({ type: "tap", emotion: "anger" }));
-        }
+        sendIfConnected({ type: "tap", emotion: "anger" });
     });
-
-    console.log('Tap detection initialized on area');
 };
 
 // DISGUST
@@ -154,15 +142,10 @@ const pinchDetection = () => {
         if (now - lastPinchTime < 500) return;
         lastPinchTime = now;
 
-        if (peer && peer.connected) {
-            peer.send(JSON.stringify({
-                type: "pinch",
-                emotion: "disgust",
-                scale: event.scale
-            }));
-        } else {
-            console.warn('Pinch detected but not connected');
-        }
+        sendIfConnected({
+            type: "pinch",
+            emotion: "disgust"
+        });
     });
 };
 
@@ -195,13 +178,11 @@ const tiltDetection = () => {
         if (direction) {
             lastTiltTime = now;
 
-            if (peer && peer.connected) {
-                peer.send(JSON.stringify({
-                    type: "tilt",
-                    emotion: "looking",
-                    direction: direction
-                }));
-            }
+            sendIfConnected({
+                type: "tilt",
+                emotion: "looking",
+                direction: direction
+            });
         }
     });
 };
