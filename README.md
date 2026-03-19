@@ -48,7 +48,7 @@
 - sender.js als initiator OK
 - qr code scannen alleen zichtbaar als geen verbinding is OK
 - disconnect toevoegen als er geen verbinding is -> qr code wordt terug zichtbaar OK
-- index2.js van naam veranderen 
+- index2.js van naam veranderen OK
 
 # Briefing
 ### Minimaal
@@ -2104,4 +2104,23 @@ In socket.on ('peerReady', peerId)
 - index.html -> blijft index.html zodat url root / blijft werken
 
 - in index.html de namen veranderen
+
+## Laatste AI check voor overbodige dingen en fouten
+Medium: Reconnect op sender kan vastlopen na een disconnect
+- In sender.js:204 en sender.js:213 wordt alleen een nieuwe peer gemaakt als peer falsy is. Maar bij een close/error wordt peer nergens op null gezet (er is enkel een error log in sender.js:53). Daardoor kan een “gesloten maar nog bestaande” peer blijven hangen en herconnectie blokkeren.
+
+Low: Disconnect-flow op desktop wordt dubbel getriggerd
+- Bij server-event in desktop.js:142 doe je currentPeer.destroy in desktop.js:144, en dat triggert daarna ook peer close in desktop.js:180. Beide paden roepen dezelfde disconnect-afhandeling aan. Functioneel meestal ok, maar onnodige dubbele state-updates kunnen later side effects geven.
+
+Low: Ongebruikte of overbodige code
+- De onDisconnected callback parameter in sendIfConnected lijkt niet gebruikt te worden: sender.js:60.
+- De event parameter bij pinch wordt niet gebruikt: sender.js:139.
+- De clients map op server wordt enkel gezet/verwijderd, maar nergens functioneel gelezen: index.js:21.
+
+# Reflectie op AI gebruik
+- geholpen om dingen te vinden dat ik zelf niet had gezien
+- uitleg geven en verduidelijking bieden
+- code voorstellen maken bij dingen dat ik niet wist hoe te beginnen
+- errors opgelost en uitgelegd
+- ik snap overal wel wat is gebeurd, heb ook bepaalde comments laten staan voor verduidelijking voor mezelf of er extra bijgezet waar ik het nodig vond
 

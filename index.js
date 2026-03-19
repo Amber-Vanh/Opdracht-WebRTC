@@ -18,12 +18,10 @@ server.listen(port, () => {
 
 const io = require('socket.io')(server);
 
-const clients = {};
 const senderToDesktop = {};
 
 // socket event handlers
 const handleConnection = (socket) => {
-  clients[socket.id] = { id: socket.id };
   console.log(`Client connected: ${socket.id}`);
 };
 
@@ -40,7 +38,6 @@ const handleDisconnect = (socket) => {
     }
   });
 
-  delete clients[socket.id];
   console.log(`Client disconnected: ${socket.id}`);
 };
 

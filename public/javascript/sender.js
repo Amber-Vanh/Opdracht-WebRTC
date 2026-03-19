@@ -50,18 +50,20 @@ const createPeer = () => {
         }
     });
 
+    peer.on('close', () => {
+        peer = null;
+    });
+
     peer.on('error', err => {
         console.error("Peer error:", err);
+        peer = null;
     });
 };
 
 const getUrlParameter = (name) => new URLSearchParams(window.location.search).get(name);
 
-const sendIfConnected = (payload, onDisconnected) => {
+const sendIfConnected = (payload) => {
     if (!peer || !peer.connected) {
-        if (onDisconnected) {
-            onDisconnected();
-        }
         return false;
     }
 
@@ -136,7 +138,7 @@ const pinchDetection = () => {
 
     let lastPinchTime = 0;
 
-    hammer.on('pinch', (event) => {
+    hammer.on('pinch', () => {
         // Throttle to prevent multiple sends
         const now = Date.now();
         if (now - lastPinchTime < 500) return;

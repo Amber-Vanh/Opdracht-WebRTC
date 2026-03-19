@@ -178,10 +178,16 @@ const connectPeer = (peerId) => {
     });
 
     peer.on('close', () => {
+        if (currentPeer !== peer) {
+            return;
+        }
         handleSenderDisconnected();
     });
 
     peer.on('error', () => {
+        if (currentPeer !== peer) {
+            return;
+        }
         handleSenderDisconnected();
     });
 
