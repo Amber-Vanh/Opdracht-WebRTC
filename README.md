@@ -2099,5 +2099,9 @@ In socket.on ('peerReady', peerId)
 ```
 
 ## Index2.js veranderen van naam
-- index2.js is niet echt een duidelijke naam, ik ga deze veranderen naar desktop.js
-- index.html moet ook aangepast worden zodat deze desktop.js laadt in plaats van index2.js
+- index2.js -> desktop.js
+- index.css -> desktop.css
+- index.html -> blijft index.html zodat url root / blijft werken
+
+- in index.html de namen veranderen
+
