@@ -45,10 +45,10 @@
 ### TEGEN 22/03 = DEADLINE
 - code simplifieren OK
 - zorg voor consistentie in code (camelCase, functie-soort) OK
-- disconnect melding toevoegen als er geen verbinding is
-- qr code scannen alleen zichtbaar als geen verbinding is
-- index2.js van naam veranderen
-- sender.js als initiator
+- sender.js als initiator OK
+- qr code scannen alleen zichtbaar als geen verbinding is OK
+- disconnect toevoegen als er geen verbinding is -> qr code wordt terug zichtbaar OK
+- index2.js van naam veranderen 
 
 # Briefing
 ### Minimaal
@@ -1990,3 +1990,114 @@ Er staan geen console.error of console.warn in dit bestand, dus je kan het vrij 
 
 ### Meeste console logs heb ik verwijderd
 - sommige comments in index2.js heb ik gewoon in comments geplaatst, deze kunnen handig zijn mochten er problemen ontstaan in de toekomst
+
+## sender als initiator
+- initiator: false => desktop
+- initiator: true => sender
+
+## Qr code enkel bij geen connectie
+- nu verschijnt de qr code nog steeds als er al een connectie is
+### prompt
+```
+Can you make sure that the qr-code is only visible when there is no connection?
+```
+
+### Oplossing
+What changed in index2.js:
+- Added a helper setQrVisible(isVisible) to toggle the QR element display.
+- On socket connect, QR is shown (waiting state).
+- On peer connect, QR is hidden (connected state).
+- On peer close or error, QR is shown again (disconnected state).
+- On init, QR starts visible.
+
+Validation:
+- Checked for JS errors in index2.js: none found.
+
+### index2.js
+```javascript
+const setQrVisible = (isVisible) => {
+    if (!$qr) return;
+    $qr.style.display = isVisible ? 'block' : 'none';
+};
+```
+
+- socket.on connect => setQrVisible(true);
+- peer.on connect => setQrVisible(false);
+- peer.on close => setQrVisible(true);
+- peer.on error => setQrVisible(true);
+- init => setQrVisible(true);
+
+### Styling
+```javascript
+const setQrVisible = (isVisible) => {
+    if (!$qr) return;
+    $qr.style.visibility = isVisible ? 'visible' : 'hidden';
+    $qr.style.pointerEvents = isVisible ? 'auto' : 'none';
+};
+```
+
+## Disconnect melding
+### prompt
+```
+Now can you make sure that when the sender disconnects, you get the qr code back on the desktop
+```
+
+### Index.js
+```javascript
+const senderToDesktop = {};
+```
+In const handleDisconnect
+```javascript
+  const connectedDesktopId = senderToDesktop[socket.id];
+  if (connectedDesktopId) {
+    io.to(connectedDesktopId).emit('peerDisconnected', socket.id);
+    delete senderToDesktop[socket.id];
+  }
+
+  Object.keys(senderToDesktop).forEach(senderId => {
+    if (senderToDesktop[senderId] === socket.id) {
+      delete senderToDesktop[senderId];
+    }
+  });
+```
+In const handlePeerReady
+```javascript
+  senderToDesktop[socket.id] = peerId;
+```
+
+### Index2.js
+In socket.on ('peerReady', peerId)
+```javascript
+        if (currentPeer) {
+            currentPeer.destroy();
+            currentPeer = null;
+        }
+```
+
+```javascript
+    socket.on('peerDisconnected', () => {
+        if (currentPeer) {
+            currentPeer.destroy();
+        }
+        handleSenderDisconnected();
+    });
+```
+
+```javascript
+    peer.on('connect', () => {
+        //console.log(`WebRTC connected to ${peerId}`);
+        setQrVisible(false);
+    });
+
+    peer.on('close', () => {
+        handleSenderDisconnected();
+    });
+
+    peer.on('error', () => {
+        handleSenderDisconnected();
+    });
+```
+
+## Index2.js veranderen van naam
+- index2.js is niet echt een duidelijke naam, ik ga deze veranderen naar desktop.js
+- index.html moet ook aangepast worden zodat deze desktop.js laadt in plaats van index2.js

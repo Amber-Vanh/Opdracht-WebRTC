@@ -19,6 +19,7 @@ server.listen(port, () => {
 const io = require('socket.io')(server);
 
 const clients = {};
+const senderToDesktop = {};
 
 // socket event handlers
 const handleConnection = (socket) => {
@@ -27,6 +28,18 @@ const handleConnection = (socket) => {
 };
 
 const handleDisconnect = (socket) => {
+  const connectedDesktopId = senderToDesktop[socket.id];
+  if (connectedDesktopId) {
+    io.to(connectedDesktopId).emit('peerDisconnected', socket.id);
+    delete senderToDesktop[socket.id];
+  }
+
+  Object.keys(senderToDesktop).forEach(senderId => {
+    if (senderToDesktop[senderId] === socket.id) {
+      delete senderToDesktop[senderId];
+    }
+  });
+
   delete clients[socket.id];
   console.log(`Client disconnected: ${socket.id}`);
 };
@@ -38,6 +51,7 @@ const handleSignal = (socket, peerId, signal) => {
 
 const handlePeerReady = (socket, peerId) => {
   console.log(`Peer ${socket.id} is ready for ${peerId}`);
+  senderToDesktop[socket.id] = peerId;
   io.to(peerId).emit('peerReady', socket.id);
 };
 

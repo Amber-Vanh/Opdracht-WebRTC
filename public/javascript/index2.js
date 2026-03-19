@@ -8,6 +8,18 @@ let currentPeer = null;
 let currentAnimation = null;
 let resetToDefaultTimer = null;
 
+const setQrVisible = (isVisible) => {
+    if (!$qr) return;
+    $qr.style.visibility = isVisible ? 'visible' : 'hidden';
+    $qr.style.pointerEvents = isVisible ? 'auto' : 'none';
+};
+
+const handleSenderDisconnected = () => {
+    setQrVisible(true);
+    showDefaultState();
+    currentPeer = null;
+};
+
 const emotionAnimationMap = {
     shake: './assets/angst.json',
     swipe: './assets/blij.json',
@@ -108,10 +120,15 @@ const initSocket = () => {
         $url.textContent = url;
         $url.setAttribute('href', url);
         generateQRCode(url);
+        setQrVisible(true);
     });
 
     socket.on('peerReady', peerId => {
         //console.log(`Smartphone connected: ${peerId}`);
+        if (currentPeer) {
+            currentPeer.destroy();
+            currentPeer = null;
+        }
         currentPeer = connectPeer(peerId);
     });
 
@@ -120,6 +137,13 @@ const initSocket = () => {
         if (currentPeer) {
             currentPeer.signal(signal);
         }
+    });
+
+    socket.on('peerDisconnected', () => {
+        if (currentPeer) {
+            currentPeer.destroy();
+        }
+        handleSenderDisconnected();
     });
 };
 
@@ -135,7 +159,7 @@ const generateQRCode = (url) => {
 // WebRTC setup
 const connectPeer = (peerId) => {
     const peer = new SimplePeer({
-        initiator: true,
+        initiator: false,
         trickle: true,
         config: {
             iceServers: [
@@ -150,6 +174,15 @@ const connectPeer = (peerId) => {
 
     peer.on('connect', () => {
         //console.log(`WebRTC connected to ${peerId}`);
+        setQrVisible(false);
+    });
+
+    peer.on('close', () => {
+        handleSenderDisconnected();
+    });
+
+    peer.on('error', () => {
+        handleSenderDisconnected();
     });
 
     peer.on('data', data => {
@@ -197,6 +230,7 @@ const connectPeer = (peerId) => {
 const init = () => {
     initSocket();
     showDefaultState();
+    setQrVisible(true);
 };
 
 init();

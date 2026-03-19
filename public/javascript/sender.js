@@ -26,7 +26,7 @@ const playSound = (sound) => {
 // WebRTC setup
 const createPeer = () => {
     peer = new SimplePeer({
-        initiator: false,
+        initiator: true,
         trickle: true,
         config: {
             iceServers: [
@@ -198,6 +198,11 @@ const init = () => {
     if (!targetSocketId) {
         alert('Missing target ID in querystring');
         return false;
+    }
+
+    // veiligheid zodat de peer connectie maar 1x wordt gemaakt
+    if (!peer) {
+        createPeer();
     }
 
     socket.emit('peerReady', targetSocketId);
