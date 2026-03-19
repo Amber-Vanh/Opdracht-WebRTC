@@ -45,7 +45,10 @@
 ### TEGEN 22/03 = DEADLINE
 - code simplifieren OK
 - zorg voor consistentie in code (camelCase, functie-soort) OK
-- feedback implementeren
+- disconnect melding toevoegen als er geen verbinding is
+- qr code scannen alleen zichtbaar als geen verbinding is
+- index2.js van naam veranderen
+- sender.js als initiator
 
 # Briefing
 ### Minimaal
@@ -342,7 +345,10 @@ WebRTC
 - probleem met images oplossen -> debugs plaatsen in inspector
 
 ## 19/03
-- 
+- disconnect melding toevoegen als er geen verbinding is
+- qr code scannen alleen zichtbaar als geen verbinding is
+- index2.js van naam veranderen
+- sender.js als initiator
 
 
 # Code
